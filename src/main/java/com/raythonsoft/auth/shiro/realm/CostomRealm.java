@@ -1,11 +1,13 @@
-package com.raythonsoft.auth.shiro;
+package com.raythonsoft.auth.shiro.realm;
 
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
+import com.raythonsoft.auth.model.User;
+import com.raythonsoft.auth.service.UserService;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.util.ByteSource;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Created by Anur IjuoKaruKas on 2018/1/8.
@@ -13,6 +15,8 @@ import org.apache.shiro.subject.PrincipalCollection;
  */
 public class CostomRealm extends AuthorizingRealm {
 
+    @Autowired
+    UserService userService;
 
     /**
      * 认证：登陆
@@ -28,9 +32,22 @@ public class CostomRealm extends AuthorizingRealm {
 
         // fixme 无密认证
 
-//        Subject subject = subjectService.findBy("")
+        User user = userService.findBy("username", username);
 
-        return null;
+        if (null == user) {
+            throw new UnknownAccountException();
+        }
+
+        if (user.getLock()) {
+            throw new LockedAccountException();
+        }
+
+        return new SimpleAuthenticationInfo(
+                username,
+                password,
+                ByteSource.Util.bytes(user.getSalt()),
+                getName()
+        );
     }
 
     /**
