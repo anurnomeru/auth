@@ -43,7 +43,7 @@ public class CodeGenerator {
 
     public static void main(String[] args) {
         PATH_SERVICE = PATH_PROJECT + "/src/main/java";
-        genCode("");
+        genCode("project","resources", "role", "role_resources", "system", "user", "user_role");
     }
 
     public static void genCode(String... tableNames) {
