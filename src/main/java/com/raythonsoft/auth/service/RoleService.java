@@ -1,6 +1,9 @@
 package com.raythonsoft.auth.service;
+
 import com.raythonsoft.auth.model.Role;
 import com.raythonsoft.auth.core.Service;
+
+import java.util.List;
 
 
 /**
@@ -8,4 +11,11 @@ import com.raythonsoft.auth.core.Service;
  */
 public interface RoleService extends Service<Role> {
 
+    /**
+     * 根据用户id查询所有角色
+     *
+     * @param userId
+     * @return
+     */
+    List<Role> findAllByUserId(Integer userId);
 }

@@ -1,13 +1,21 @@
 package com.raythonsoft.auth.shiro.realm;
 
+import com.github.pagehelper.util.StringUtil;
+import com.raythonsoft.auth.model.Resources;
+import com.raythonsoft.auth.model.Role;
 import com.raythonsoft.auth.model.User;
+import com.raythonsoft.auth.service.ResourcesService;
+import com.raythonsoft.auth.service.RoleService;
 import com.raythonsoft.auth.service.UserService;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.*;
 
 /**
  * Created by Anur IjuoKaruKas on 2018/1/8.
@@ -16,7 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class CostomRealm extends AuthorizingRealm {
 
     @Autowired
-    UserService userService;
+    private UserService userService;
+
+    @Autowired
+    private ResourcesService resourcesService;
+
+    @Autowired
+    private RoleService roleService;
 
     /**
      * 认证：登陆
@@ -58,6 +72,31 @@ public class CostomRealm extends AuthorizingRealm {
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
-        return null;
+        String username = (String) principalCollection.getPrimaryPrincipal();
+        User user = userService.findBy("username", username);
+        Integer userId = user.getId();
+
+        List<Resources> permissionList = resourcesService.findAllByUserId(userId);
+        Set<String> permissionSet = new HashSet<>();
+        for (Resources next : permissionList) {
+            String permissionName = next.getName();
+            if (StringUtil.isNotEmpty(permissionName)) {
+                permissionSet.add(permissionName);
+            }
+        }
+
+        List<Role> roleList = roleService.findAllByUserId(userId);
+        Set<String> roleSet = new HashSet<>();
+        for (Role next : roleList) {
+            String roleName = next.getName();
+            if (StringUtil.isNotEmpty(roleName)){
+                roleSet.add(roleName);
+            }
+        }
+
+        SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
+        simpleAuthorizationInfo.setStringPermissions(permissionSet);
+        simpleAuthorizationInfo.setRoles(roleSet);
+        return simpleAuthorizationInfo;
     }
 }
