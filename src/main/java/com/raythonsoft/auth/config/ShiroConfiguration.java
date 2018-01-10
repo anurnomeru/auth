@@ -1,37 +1,17 @@
 package com.raythonsoft.auth.config;
 
-import com.raythonsoft.auth.shiro.factory.CustomFactory;
 import com.raythonsoft.auth.shiro.filter.CustomAccessControlFilter;
 import com.raythonsoft.auth.shiro.filter.CustomAuthenticationFilter;
-import com.raythonsoft.auth.shiro.listener.CustomSessionListener;
 import com.raythonsoft.auth.shiro.realm.CustomRealm;
-import com.raythonsoft.auth.shiro.repository.SessionRepository;
-import org.apache.shiro.codec.Base64;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.AuthorizingRealm;
-import org.apache.shiro.session.Session;
-import org.apache.shiro.session.SessionListener;
-import org.apache.shiro.session.UnknownSessionException;
-import org.apache.shiro.session.mgt.SessionFactory;
-import org.apache.shiro.session.mgt.eis.SessionDAO;
-import org.apache.shiro.spring.LifecycleBeanPostProcessor;
-import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.filter.AccessControlFilter;
 import org.apache.shiro.web.filter.authc.AuthenticationFilter;
-import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
-import org.apache.shiro.web.servlet.SimpleCookie;
-import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by Anur IjuoKaruKas on 2018/1/9.
@@ -41,7 +21,7 @@ import java.util.List;
 public class ShiroConfiguration {
 
     @Value("${shiro.login.success.url}")
-    private static String SHIRO_SUCCESS_URL;
+    private static String SHIRO_LOGIN_SUCCESS_URL;
 
     @Value("${shiro.unauthorized.url}")
     private static String SHIRO_UNAUTHORIZED_URL;
@@ -72,7 +52,7 @@ public class ShiroConfiguration {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager());
         shiroFilterFactoryBean.setLoginUrl(SHIRO_LOGIN_URL);
-        shiroFilterFactoryBean.setSuccessUrl(SHIRO_SUCCESS_URL);
+        shiroFilterFactoryBean.setSuccessUrl(SHIRO_LOGIN_SUCCESS_URL);
         shiroFilterFactoryBean.setUnauthorizedUrl(SHIRO_UNAUTHORIZED_URL);
         return shiroFilterFactoryBean;
     }
