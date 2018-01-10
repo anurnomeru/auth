@@ -14,6 +14,7 @@ public interface ResourcesService extends Service<Resources> {
 
     /**
      * 根据用户id查询所有权限
+     *
      * @param userId
      * @return
      */

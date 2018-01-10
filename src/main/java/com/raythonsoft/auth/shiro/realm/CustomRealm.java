@@ -21,7 +21,7 @@ import java.util.*;
  * Created by Anur IjuoKaruKas on 2018/1/8.
  * Description :
  */
-public class CostomRealm extends AuthorizingRealm {
+public class CustomRealm extends AuthorizingRealm {
 
     @Autowired
     private UserService userService;
