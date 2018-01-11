@@ -22,7 +22,20 @@ public class RedisConfiguration {
     @Bean
     public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) throws UnknownHostException {
         RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
+        initDomainRedisTemplate(redisTemplate, redisConnectionFactory);
+        return redisTemplate;
+    }
+
+    /**
+     * 设置数据存入 redis 的序列化方式
+     *
+     * @param redisTemplate
+     * @param redisConnectionFactory
+     */
+    private void initDomainRedisTemplate(RedisTemplate<Object, Object> redisTemplate, RedisConnectionFactory redisConnectionFactory) {
         redisTemplate.setConnectionFactory(redisConnectionFactory);
+
+        // 序列化
         Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
@@ -31,9 +44,7 @@ public class RedisConfiguration {
 
         redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-
         redisTemplate.afterPropertiesSet();
 
-        return  redisTemplate;
     }
 }

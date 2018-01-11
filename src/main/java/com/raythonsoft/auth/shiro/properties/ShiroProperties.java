@@ -10,7 +10,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @ConfigurationProperties(prefix = "shiro")
 public class ShiroProperties {
-    private String sessionIdCookie;
+
+    private String authShiroSessionId;
+
+    private String authClientSessionId;
+
+    private String authClientSessionIds;
+
+    private String authServerSessionId;
+
+    private String authServerSessionIds;
+
+    private String authServerCode;
 
     private String unauthorizedUrl;
 

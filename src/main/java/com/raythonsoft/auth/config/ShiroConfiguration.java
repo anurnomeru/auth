@@ -22,10 +22,10 @@ import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -154,10 +154,10 @@ public class ShiroConfiguration {
         SimpleCookie simpleCookie = new SimpleCookie();
         // 不会暴露给客户端
         simpleCookie.setHttpOnly(true);
-        // sessionIdCookie cookie（永久）
+        // sessionId cookie（永久）
         simpleCookie.setMaxAge(-1);
         // Cookie名称
-        simpleCookie.setName(shiroProperties().getSessionIdCookie());
+        simpleCookie.setName(shiroProperties().getAuthClientSessionId());
         return simpleCookie;
     }
 
