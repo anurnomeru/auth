@@ -25,8 +25,8 @@ public class PageModel {
      *
      * @return
      */
-    public String getOrderSql() {
-        return sortModel.getOrderSql();
+    public String orderSql() {
+        return sortModel.orderSql();
     }
 
     /**
@@ -34,9 +34,9 @@ public class PageModel {
      *
      * @return
      */
-    public Integer getDataStart() {
+    public Integer dataStart() {
         if (pageNum > 0) {
-            return pageNum = (pageNum - 1) * getDataCount();
+            return pageNum = (pageNum - 1) * dataCount();
         }
         return 0;
     }
@@ -46,7 +46,7 @@ public class PageModel {
      *
      * @return
      */
-    public Integer getDataCount() {
+    public Integer dataCount() {
         if (pageSize < 0) {
             return 0;
         }

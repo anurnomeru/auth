@@ -18,8 +18,8 @@ public class SortModel {
     @Transient
     private String sort; // asc desc 等。
 
-    public String getOrderSql() {
-        StringBuffer order = new StringBuffer();
+    public String orderSql() {
+        StringBuilder order = new StringBuilder();
 
         if (StringUtil.isNotEmpty(orderBy)) {
             order.append(orderBy);

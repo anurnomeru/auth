@@ -1,12 +1,12 @@
 package com.raythonsoft.auth.config;
 
 import com.raythonsoft.auth.shiro.properties.ShiroProperties;
-import com.raythonsoft.auth.shiro.factory.CustomFactory;
+import com.raythonsoft.auth.shiro.session.CustomSessionFactory;
 import com.raythonsoft.auth.shiro.filter.CustomAccessControlFilter;
 import com.raythonsoft.auth.shiro.filter.CustomAuthenticationFilter;
 import com.raythonsoft.auth.shiro.listener.CustomSessionListener;
 import com.raythonsoft.auth.shiro.realm.CustomRealm;
-import com.raythonsoft.auth.shiro.repository.SessionRepository;
+import com.raythonsoft.auth.shiro.session.SessionDao;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -35,7 +35,6 @@ import java.util.List;
  * Description :
  */
 @Configuration
-@Component
 public class ShiroConfiguration {
 
     /**
@@ -115,10 +114,14 @@ public class ShiroConfiguration {
      */
     @Bean
     public DefaultWebSessionManager sessionManager() {
+        // 废弃servlet的会话管理
         DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
         // 全局session超时时间
         sessionManager.setGlobalSessionTimeout(shiroProperties().getSessionTimeout());
+
+        // sessionDao
         sessionManager.setSessionDAO(sessionDAO());
+        // 在某些servlet容器中，默认使用JSESSIONID Cookie维护会话，这里使用自己的会话机制
         sessionManager.setSessionIdCookieEnabled(true);
         sessionManager.setSessionIdCookie(sessionIdCookie());
         sessionManager.setSessionValidationSchedulerEnabled(false);
@@ -138,7 +141,7 @@ public class ShiroConfiguration {
      */
     @Bean
     public SessionDAO sessionDAO() {
-        return new SessionRepository();
+        return new SessionDao();
     }
 
     /**
@@ -151,10 +154,10 @@ public class ShiroConfiguration {
         SimpleCookie simpleCookie = new SimpleCookie();
         // 不会暴露给客户端
         simpleCookie.setHttpOnly(true);
-        // sessionId cookie（永久）
+        // sessionIdCookie cookie（永久）
         simpleCookie.setMaxAge(-1);
         // Cookie名称
-        simpleCookie.setName(shiroProperties().getSessionId());
+        simpleCookie.setName(shiroProperties().getSessionIdCookie());
         return simpleCookie;
     }
 
@@ -175,7 +178,7 @@ public class ShiroConfiguration {
      */
     @Bean
     public SessionFactory sessionFactory() {
-        return new CustomFactory();
+        return new CustomSessionFactory();
     }
 
     /**
