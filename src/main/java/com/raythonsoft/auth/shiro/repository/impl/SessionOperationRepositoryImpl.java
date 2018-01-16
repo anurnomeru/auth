@@ -10,6 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -26,6 +27,34 @@ public class SessionOperationRepositoryImpl implements SessionOperationRepositor
 
     @Autowired
     private ShiroProperties shiroProperties;
+
+    @Override
+    public String genShiroSessionId(Serializable sessionId) {
+        return String.format(AuthConstant.ID_FORM, shiroProperties.getAuthShiroSessionId(), sessionId);
+    }
+
+    @Override
+    public void saveOrUpdateShiroSession(Session session, Serializable sessionId, boolean isCreate) {
+        redisTemplate.opsForValue().set(this.genShiroSessionId(sessionId), session, session.getTimeout(), TimeUnit.MILLISECONDS);
+        if (isCreate) {
+            log.info(String.format("doCreate >>>>> sessionId=%s", sessionId));
+        } else {
+            log.info(String.format("doUpdate >>>>> sessionId=%s", sessionId));
+        }
+    }
+
+    @Override
+    public void deleteShiroSession(Serializable sessionId) {
+        redisTemplate.delete(this.genShiroSessionId(sessionId));
+        log.info(String.format("doDelete >>>>> sessionId=%s", sessionId));
+    }
+
+    @Override
+    public Session getShiroSession(Serializable sessionId) {
+        Session session = (Session) redisTemplate.opsForValue().get(this.genShiroSessionId(sessionId));
+        log.info(String.format("doReadSession >>>>> sessionId=%s", sessionId));
+        return session;
+    }
 
     @Override
     public void deleteClientSessionId(String sessionId) {
@@ -64,28 +93,22 @@ public class SessionOperationRepositoryImpl implements SessionOperationRepositor
                 )
         );
 
-        // FIXME: 2018/1/16 what?????
-        // 维护会话id列表，提供会话分页管理
+        this.deleteSessionFromServerSessionIds(sessionId);
+    }
+
+    @Override
+    public void deleteSessionFromServerSessionIds(String sessionId) {
+        // 维护会话id列表，就是把它删掉
         redisTemplate.opsForSet().remove(shiroProperties.getAuthServerSessionIds(), sessionId);
     }
 
     @Override
-    public void saveShiroSession(Session session, Serializable sessionId) {
-        redisTemplate.opsForValue().set(this.genShiroSessionId(sessionId), session, session.getTimeout(), TimeUnit.MILLISECONDS);
+    public long getServerCount() {
+        return redisTemplate.opsForList().size(shiroProperties.getAuthServerSessionIds());
     }
 
     @Override
-    public Session getShiroSession(Serializable sessionId) {
-        return (Session) redisTemplate.opsForValue().get(this.genShiroSessionId(sessionId));
-    }
-
-    @Override
-    public void deleteShiroSession(Serializable sessionId) {
-        redisTemplate.delete(this.genShiroSessionId(sessionId));
-    }
-
-    @Override
-    public String genShiroSessionId(Serializable sessionId) {
-        return String.format(AuthConstant.ID_FORM, shiroProperties.getAuthShiroSessionId(), sessionId);
+    public List<Object> getServerSession(int offset, int limit) {
+        return redisTemplate.opsForList().range(shiroProperties.getAuthServerSessionIds(), offset, limit);
     }
 }

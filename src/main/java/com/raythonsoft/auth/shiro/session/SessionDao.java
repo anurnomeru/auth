@@ -2,22 +2,19 @@ package com.raythonsoft.auth.shiro.session;
 
 import com.raythonsoft.auth.common.AuthConstant;
 import com.raythonsoft.auth.common.ShiroTypeEnum;
-import com.raythonsoft.auth.shiro.properties.ShiroProperties;
+import com.raythonsoft.auth.shiro.model.CustomSession;
+import com.raythonsoft.auth.shiro.model.SessionPageInfo;
 import com.raythonsoft.auth.shiro.repository.SessionOperationRepository;
-import lombok.extern.log4j.Log4j;
-import org.apache.shiro.dao.DataAccessException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.ValidatingSession;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static com.raythonsoft.auth.common.ProjectConstant.SHIRO_TYPE;
 
@@ -25,7 +22,6 @@ import static com.raythonsoft.auth.common.ProjectConstant.SHIRO_TYPE;
  * Created by Anur IjuoKaruKas on 2018/1/10.
  * Description :
  */
-@Log4j
 @Component
 public class SessionDao extends EnterpriseCacheSessionDAO {
 
@@ -44,8 +40,7 @@ public class SessionDao extends EnterpriseCacheSessionDAO {
         Serializable sessionId = generateSessionId(session);
         assignSessionId(session, sessionId);
 
-        sessionOperationRepository.saveShiroSession(session, sessionId);
-        log.info(String.format("doCreate >>>>> sessionId=%s", sessionId));
+        sessionOperationRepository.saveOrUpdateShiroSession(session, sessionId, true);
         return sessionId;
     }
 
@@ -58,7 +53,6 @@ public class SessionDao extends EnterpriseCacheSessionDAO {
     @Override
     protected Session doReadSession(Serializable sessionId) {
         Session session = sessionOperationRepository.getShiroSession(sessionId);
-        log.info(String.format("doReadSession >>>>> sessionId=%s", sessionId));
         return session;
     }
 
@@ -81,8 +75,7 @@ public class SessionDao extends EnterpriseCacheSessionDAO {
             customSession.setAttribute(AuthConstant.FORCE_LOGOUT, cacheSession.getAttribute(AuthConstant.FORCE_LOGOUT));
         }
 
-        sessionOperationRepository.saveShiroSession(session, session.getId());
-        log.info(String.format("doUpdate >>>>> sessionId=%s", customSession.getId()));
+        sessionOperationRepository.saveOrUpdateShiroSession(session, session.getId(), false);
     }
 
     /**
@@ -92,7 +85,6 @@ public class SessionDao extends EnterpriseCacheSessionDAO {
      */
     @Override
     protected void doDelete(Session session) {
-        // FIXME: 2018/1/16 还有很多
         String sessionId = String.valueOf(session.getId());
         String shiroType = String.valueOf(session.getAttribute(SHIRO_TYPE));// 判断当前session是客户端还是服务器端
 
@@ -106,18 +98,26 @@ public class SessionDao extends EnterpriseCacheSessionDAO {
 
         // 删除shiro下的Session
         sessionOperationRepository.deleteShiroSession(sessionId);
-        log.info(String.format("doDelete >>>>> sessionId=%s", session.getId()));
+
     }
 
-//    public Map getActiveSessions(int offset, int limit) {
-//        Map sessions = new HashMap<>();
-//        long sessionsCount = redisTemplate.opsForSet().size(shiroProperties.getAuthServerSessionIds());
-//
-//        List<Object> sessionIdList = redisTemplate.opsForList().range(shiroProperties.getAuthServerSessionIds(), offset, limit);
-//        for (Object sessionId : sessionIdList) {
-//            String sessionId = redisTemplate.opsForValue()
-//        }
-//
-//    }
+    public SessionPageInfo getActiveSessions(int offset, int limit) {
+        long total = sessionOperationRepository.getServerCount();
+
+        // fixme 分页存疑
+        List<Object> sessionIdList = sessionOperationRepository.getServerSession(offset, limit);
+        List<Session> sessionList = new ArrayList<>();
+        for (Object sessionId : sessionIdList) {
+            Session session = sessionOperationRepository.getShiroSession((String) sessionId);
+            if (null == session) {
+                sessionOperationRepository.deleteSessionFromServerSessionIds((String) sessionId);
+                total = total - 1;
+                continue;
+            }
+            sessionList.add(session);
+        }
+
+        return SessionPageInfo.builder().rows(sessionList).total(total).build();
+    }
 
 }

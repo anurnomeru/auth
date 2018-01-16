@@ -1,5 +1,6 @@
 package com.raythonsoft.auth.shiro.session;
 
+import com.raythonsoft.auth.shiro.model.CustomSession;
 import com.raythonsoft.auth.util.NetworkUtil;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.SessionContext;

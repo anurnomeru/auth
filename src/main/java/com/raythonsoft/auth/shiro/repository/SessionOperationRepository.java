@@ -3,6 +3,7 @@ package com.raythonsoft.auth.shiro.repository;
 import org.apache.shiro.session.Session;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by Anur IjuoKaruKas on 2018/1/16.
@@ -11,18 +12,12 @@ import java.io.Serializable;
 public interface SessionOperationRepository {
 
     /**
-     * 内部方法，用于删除client会话
+     * 生成shiroSessionId
      *
      * @param sessionId
+     * @return
      */
-    void deleteClientSessionId(String sessionId);
-
-    /**
-     * 内部方法，用于删除server会话
-     *
-     * @param sessionId
-     */
-    void deleteServerSessionId(String sessionId);
+    String genShiroSessionId(Serializable sessionId);
 
     /**
      * 保存sessionId ==> key
@@ -30,8 +25,16 @@ public interface SessionOperationRepository {
      *
      * @param session
      * @param sessionId
+     * @param isCreate  打印日志用
      */
-    void saveShiroSession(Session session, Serializable sessionId);
+    void saveOrUpdateShiroSession(Session session, Serializable sessionId, boolean isCreate);
+
+    /**
+     * 删除保存在redis的 shiro session
+     *
+     * @param sessionId
+     */
+    void deleteShiroSession(Serializable sessionId);
 
     /**
      * 获取保存在redis的 shiro session
@@ -42,17 +45,37 @@ public interface SessionOperationRepository {
     Session getShiroSession(Serializable sessionId);
 
     /**
-     * 删除保存在redis的 shiro session
+     * 用于删除client会话
      *
      * @param sessionId
      */
-    void deleteShiroSession(Serializable sessionId);
+    void deleteClientSessionId(String sessionId);
 
     /**
-     * 生成shiroSessionId
+     * 用于删除server会话
      *
      * @param sessionId
+     */
+    void deleteServerSessionId(String sessionId);
+
+    /**
+     * 将sessionId从某服务列表删掉
+     *
+     * @param sessionId
+     */
+    void deleteSessionFromServerSessionIds(String sessionId);
+
+    /**
+     * 获取当前的总服务器数
+     *
      * @return
      */
-    String genShiroSessionId(Serializable sessionId);
+    long getServerCount();
+
+    /**
+     * 获取当前服务器的id
+     *
+     * @return
+     */
+    List<Object> getServerSession(int offset, int limit);
 }
