@@ -13,25 +13,25 @@ public class ShiroProperties {
 
     private String authShiroSessionId;
 
-    private String authClientSessionId;
+    private String authClientSessionId;// client局部会话
 
-    private String authClientSessionIds;
+    private String authClientSessionIds;// 在code下注册局部会话
 
-    private String authServerSessionId;
+    private String authServerSessionId;// server全局会话
 
-    private String authServerSessionIds;
+    private String authServerSessionIds;// 在code下注册全局会话
 
-    private String authServerCode;
+    private String authServerCode;// server code校验值
 
-    private String unauthorizedUrl;
+    private String unauthorizedUrl;// 无权限跳转
 
-    private String loginSuccessUrl;
+    private String loginSuccessUrl;// 登陆成功跳转
 
-    private String loginUrl;
+    private String loginUrl;// 登录页
 
-    private Integer sessionTimeout;
+    private Integer sessionTimeout;// 超时时间
 
-    private Integer rememberMeTimeout;
+    private Integer rememberMeTimeout;// 记住我超时时间
 
-    private String rememberMeCipherKey;
+    private String rememberMeCipherKey;// 记住我加密密钥
 }

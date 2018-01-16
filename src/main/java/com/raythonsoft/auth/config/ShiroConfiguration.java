@@ -68,20 +68,20 @@ public class ShiroConfiguration {
      *
      * @return
      */
-    @Bean
-    public AuthenticationFilter authenticationFilter() {
-        return new CustomAuthenticationFilter();
-    }
+//    @Bean
+//    public AuthenticationFilter authenticationFilter() {
+//        return new CustomAuthenticationFilter();
+//    }
 
     /**
      * Access 过滤器，用于会话的强制关闭
      *
      * @return
      */
-    @Bean
-    public AccessControlFilter accessControlFilter() {
-        return new CustomAccessControlFilter();
-    }
+//    @Bean
+//    public AccessControlFilter accessControlFilter() {
+//        return new CustomAccessControlFilter();
+//    }
 
     /**
      * 安全管理器
@@ -124,6 +124,7 @@ public class ShiroConfiguration {
         // 在某些servlet容器中，默认使用JSESSIONID Cookie维护会话，这里使用自己的会话机制
         sessionManager.setSessionIdCookieEnabled(true);
         sessionManager.setSessionIdCookie(sessionIdCookie());
+        // 定时检查session失效
         sessionManager.setSessionValidationSchedulerEnabled(false);
 
         List<SessionListener> sessionListenerList = new ArrayList<>();
@@ -156,7 +157,7 @@ public class ShiroConfiguration {
         simpleCookie.setHttpOnly(true);
         // sessionId cookie（永久）
         simpleCookie.setMaxAge(-1);
-        // Cookie名称
+        // Cookie名称，覆盖了JSESSIONID
         simpleCookie.setName(shiroProperties().getAuthClientSessionId());
         return simpleCookie;
     }

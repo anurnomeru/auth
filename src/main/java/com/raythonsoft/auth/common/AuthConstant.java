@@ -1,0 +1,13 @@
+package com.raythonsoft.auth.common;
+
+/**
+ * Created by Anur IjuoKaruKas on 2018/1/16.
+ * Description :
+ */
+public class AuthConstant {
+    public static final String ID_FORM = "%s_%s";
+
+    public static final String FORCE_LOGOUT = "FORCE_LOGOUT";
+
+
+}

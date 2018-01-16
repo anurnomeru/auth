@@ -10,6 +10,9 @@ import javax.servlet.ServletResponse;
  * Description :
  */
 public class CustomAccessControlFilter extends AccessControlFilter {
+
+
+
     @Override
     protected boolean isAccessAllowed(ServletRequest servletRequest, ServletResponse servletResponse, Object o) throws Exception {
         return false;
