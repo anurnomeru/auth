@@ -13,15 +13,15 @@ public class ShiroProperties {
 
     private String authShiroSessionId;
 
-    private String authClientSessionId;// client局部会话
+    private String authClientSessionId;// client局部会话 <Set>
 
-    private String authClientSessionIds;// 在code下注册局部会话
+    private String authClientSessionIds;// 在code下注册局部会话 <Set>
 
-    private String authServerSessionId;// server全局会话
+    private String authServerSessionId;// server全局会话 <Set>
 
-    private String authServerSessionIds;// 在code下注册全局会话
+    private String authServerSessionIds;// 在code下注册全局会话 <List>
 
-    private String authServerCode;// server code校验值
+    private String authServerCode;// server code校验值 <Set>
 
     private String unauthorizedUrl;// 无权限跳转
 
