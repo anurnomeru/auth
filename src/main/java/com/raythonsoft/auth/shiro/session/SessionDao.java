@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.raythonsoft.auth.common.ProjectConstant.SHIRO_TYPE;
 
@@ -40,7 +41,7 @@ public class SessionDao extends EnterpriseCacheSessionDAO {
         Serializable sessionId = generateSessionId(session);
         assignSessionId(session, sessionId);
 
-        sessionOperationRepository.saveOrUpdateShiroSession(session, sessionId, true);
+        sessionOperationRepository.saveOrUpdateShiroSession((CustomSession) session, sessionId, true);
         return sessionId;
     }
 
@@ -75,7 +76,7 @@ public class SessionDao extends EnterpriseCacheSessionDAO {
             customSession.setAttribute(AuthConstant.FORCE_LOGOUT, cacheSession.getAttribute(AuthConstant.FORCE_LOGOUT));
         }
 
-        sessionOperationRepository.saveOrUpdateShiroSession(session, session.getId(), false);
+        sessionOperationRepository.saveOrUpdateShiroSession(customSession, customSession.getId(), false);
     }
 
     /**
@@ -101,6 +102,13 @@ public class SessionDao extends EnterpriseCacheSessionDAO {
 
     }
 
+    /**
+     * 获取带分页的未超时session
+     *
+     * @param offset
+     * @param limit
+     * @return
+     */
     public SessionPageInfo getActiveSessions(int offset, int limit) {
         long total = sessionOperationRepository.getServerCount();
 
@@ -118,6 +126,37 @@ public class SessionDao extends EnterpriseCacheSessionDAO {
         }
 
         return SessionPageInfo.builder().rows(sessionList).total(total).build();
+    }
+
+    /**
+     * 强制使某些session退出
+     *
+     * @param stringSet
+     * @return
+     */
+    public int forceLogout(Set<String> stringSet) {
+        for (String sessionId : stringSet) {
+            CustomSession customSession = sessionOperationRepository.getShiroSession(sessionId);
+            customSession.setOnlineStatusEnum(OnlineStatusEnum.FORCE_LOGOUT);
+            customSession.setAttribute(AuthConstant.FORCE_LOGOUT, AuthConstant.FORCE_LOGOUT);// FIXME: 2018/1/16 存疑
+            sessionOperationRepository.saveOrUpdateShiroSession(customSession, customSession.getId(), false);
+        }
+        return stringSet.size();
+    }
+
+    /**
+     * 更改session状态
+     *
+     * @param sessionId
+     * @param onlineStatusEnum
+     */
+    public void updateStatus(Serializable sessionId, OnlineStatusEnum onlineStatusEnum) {
+        CustomSession customSession = sessionOperationRepository.getShiroSession(sessionId);
+        if (null == customSession) {
+            return;
+        }
+        customSession.setOnlineStatusEnum(onlineStatusEnum);
+        sessionOperationRepository.saveOrUpdateShiroSession(customSession, sessionId, false);
     }
 
 }

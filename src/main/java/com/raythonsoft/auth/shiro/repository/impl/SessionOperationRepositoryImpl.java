@@ -1,6 +1,7 @@
 package com.raythonsoft.auth.shiro.repository.impl;
 
 import com.raythonsoft.auth.common.AuthConstant;
+import com.raythonsoft.auth.shiro.model.CustomSession;
 import com.raythonsoft.auth.shiro.properties.ShiroProperties;
 import com.raythonsoft.auth.shiro.repository.SessionOperationRepository;
 import lombok.extern.log4j.Log4j;
@@ -34,13 +35,14 @@ public class SessionOperationRepositoryImpl implements SessionOperationRepositor
     }
 
     @Override
-    public void saveOrUpdateShiroSession(Session session, Serializable sessionId, boolean isCreate) {
-        redisTemplate.opsForValue().set(this.genShiroSessionId(sessionId), session, session.getTimeout(), TimeUnit.MILLISECONDS);
+    public void saveOrUpdateShiroSession(CustomSession customSession, Serializable sessionId, boolean isCreate) {
+        redisTemplate.opsForValue().set(this.genShiroSessionId(sessionId), customSession, customSession.getTimeout(), TimeUnit.MILLISECONDS);
         if (isCreate) {
             log.info(String.format("doCreate >>>>> sessionId=%s", sessionId));
         } else {
             log.info(String.format("doUpdate >>>>> sessionId=%s", sessionId));
         }
+        log.info(String.format("status >>>>> onlineStatus=%s", customSession.getOnlineStatusEnum()));
     }
 
     @Override
@@ -50,10 +52,10 @@ public class SessionOperationRepositoryImpl implements SessionOperationRepositor
     }
 
     @Override
-    public Session getShiroSession(Serializable sessionId) {
-        Session session = (Session) redisTemplate.opsForValue().get(this.genShiroSessionId(sessionId));
+    public CustomSession getShiroSession(Serializable sessionId) {
+        CustomSession customSession = (CustomSession) redisTemplate.opsForValue().get(this.genShiroSessionId(sessionId));
         log.info(String.format("doReadSession >>>>> sessionId=%s", sessionId));
-        return session;
+        return customSession;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.raythonsoft.auth.shiro.repository;
 
+import com.raythonsoft.auth.shiro.model.CustomSession;
 import org.apache.shiro.session.Session;
 
 import java.io.Serializable;
@@ -23,11 +24,11 @@ public interface SessionOperationRepository {
      * 保存sessionId ==> key
      * session ==> value
      *
-     * @param session
+     * @param customSession
      * @param sessionId
-     * @param isCreate  打印日志用
+     * @param isCreate      打印日志用
      */
-    void saveOrUpdateShiroSession(Session session, Serializable sessionId, boolean isCreate);
+    void saveOrUpdateShiroSession(CustomSession customSession, Serializable sessionId, boolean isCreate);
 
     /**
      * 删除保存在redis的 shiro session
@@ -42,7 +43,7 @@ public interface SessionOperationRepository {
      * @param sessionId
      * @return
      */
-    Session getShiroSession(Serializable sessionId);
+    CustomSession getShiroSession(Serializable sessionId);
 
     /**
      * 用于删除client会话
