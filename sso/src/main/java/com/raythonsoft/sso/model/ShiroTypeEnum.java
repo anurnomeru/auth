@@ -1,4 +1,4 @@
-package com.raythonsoft.repository.common.model;
+package com.raythonsoft.sso.model;
 
 /**
  * Created by Anur IjuoKaruKas on 2018/1/11.

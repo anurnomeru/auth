@@ -1,7 +1,6 @@
 package com.raythonsoft.sso.session;
 
-import com.raythonsoft.repository.common.RepositoryConstant;
-import com.raythonsoft.repository.common.model.ShiroTypeEnum;
+import com.raythonsoft.sso.model.ShiroTypeEnum;
 import com.raythonsoft.sso.common.SsoConstant;
 import com.raythonsoft.sso.model.CustomSession;
 import com.raythonsoft.sso.model.SessionPageInfo;
