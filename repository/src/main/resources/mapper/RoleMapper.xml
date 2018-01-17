@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RoleMapper">
+    <resultMap id="BaseResultMap" type="com.raythonsoft.repository.model.Role">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="pic_uri" jdbcType="VARCHAR" property="picUri"/>
+        <result column="project_id" jdbcType="INTEGER" property="projectId"/>
+        <result column="server_id" jdbcType="INTEGER" property="serverId"/>
+        <result column="orders" jdbcType="INTEGER" property="orders"/>
+    </resultMap>
+
+    <select id="selectAllByUserId" resultMap="BaseResultMap">
+        SELECT *
+        FROM role
+        WHERE id IN (SELECT role_id
+                     FROM user_role
+                     WHERE user_id = #{userId})
+    </select>
+</mapper>
