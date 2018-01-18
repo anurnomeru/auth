@@ -1,12 +1,11 @@
 package com.raythonsoft.repository.config;
 
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter4;
-import com.raythonsoft.repository.common.model.Result;
-import com.raythonsoft.repository.common.model.ResultCode;
+import com.raythonsoft.common.model.Result;
+import com.raythonsoft.common.model.ResultCode;
 import com.raythonsoft.repository.exception.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

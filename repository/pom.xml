@@ -38,6 +38,12 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.raythonsoft</groupId>
+			<artifactId>common</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
 		<!-- spring-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

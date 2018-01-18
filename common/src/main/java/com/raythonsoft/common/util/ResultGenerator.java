@@ -1,7 +1,8 @@
-package com.raythonsoft.repository.common;
+package com.raythonsoft.common.util;
 
-import com.raythonsoft.repository.common.model.Result;
-import com.raythonsoft.repository.common.model.ResultCode;
+
+import com.raythonsoft.common.model.Result;
+import com.raythonsoft.common.model.ResultCode;
 
 /**
  * 响应结果生成工具

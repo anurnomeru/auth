@@ -1,4 +1,4 @@
-package com.raythonsoft.repository.common.model;
+package com.raythonsoft.common.model;
 
 
 /**

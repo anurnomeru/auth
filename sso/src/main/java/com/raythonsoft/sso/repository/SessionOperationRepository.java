@@ -1,9 +1,12 @@
 package com.raythonsoft.sso.repository;
 
+import com.raythonsoft.sso.common.SsoConstant;
 import com.raythonsoft.sso.model.CustomSession;
+import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Anur IjuoKaruKas on 2018/1/16.
@@ -18,6 +21,72 @@ public interface SessionOperationRepository {
      * @return
      */
     String genShiroSessionId(Serializable sessionId);
+
+    /**
+     * 生成clientSessionId
+     *
+     * @param sessionId
+     * @return
+     */
+    String genClientSessionId(Serializable sessionId);
+
+    /**
+     * 生成clientSessionIds
+     *
+     * @param code
+     * @return
+     */
+    String genClientSessionIds(String code);
+
+    /**
+     * 生成serverSessionId
+     *
+     * @param sessionId
+     * @return
+     */
+    String genServerSessionId(Serializable sessionId);
+
+    /**
+     * 生成serverSessionIds
+     *
+     * @return
+     */
+    String genServerSessionIds();
+
+    /**
+     * 生成server校验值
+     *
+     * @param code
+     * @return
+     */
+    String genServerCode(String code);
+
+    /**
+     * 从redis获取cacheCode
+     *
+     * @param genningSessionId
+     * @return
+     */
+    String getCodeByGenningSessionId(String genningSessionId);
+
+    /**
+     * 保存从cacheCode到redis
+     *
+     * @param genningSessionId
+     * @param cacheCode
+     * @param timeout
+     * @param timeUnit
+     */
+    void setCodeByGenningSessionId(String genningSessionId, String cacheCode, Integer timeout, TimeUnit timeUnit);
+
+    /**
+     * 刷新cacheCode
+     *
+     * @param genningSessionId
+     * @param timeout
+     * @param timeUnit
+     */
+    void expireCodeByGenningSessionId(String genningSessionId, Integer timeout, TimeUnit timeUnit);
 
     /**
      * 保存sessionId ==> key

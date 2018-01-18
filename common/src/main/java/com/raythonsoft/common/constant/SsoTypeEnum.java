@@ -1,16 +1,16 @@
-package com.raythonsoft.sso.model;
+package com.raythonsoft.common.constant;
 
 /**
  * Created by Anur IjuoKaruKas on 2018/1/11.
  * Description :
  */
-public enum ShiroTypeEnum {
+public enum SsoTypeEnum {
     CLIENT("客户端", "0"), SERVER("服务端", "1");
 
     private String name;
     private String index;
 
-    ShiroTypeEnum(String name, String index) {
+    SsoTypeEnum(String name, String index) {
         this.name = name;
         this.index = index;
     }

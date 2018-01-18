@@ -1,6 +1,7 @@
 package com.raythonsoft.repository.page;
 
 import com.github.pagehelper.Dialect;
+import com.github.pagehelper.util.BaseSqlUtil;
 import com.github.pagehelper.util.MSUtils;
 import com.github.pagehelper.util.SqlUtil;
 import com.github.pagehelper.util.StringUtil;
@@ -49,7 +50,7 @@ public class CustomSqlUtil extends SqlUtil {
         try {
             return doIntercept(invocation);
         } finally {
-            clearLocalPage();
+            BaseSqlUtil.clearLocalPage();
         }
     }
 
@@ -263,7 +264,7 @@ public class CustomSqlUtil extends SqlUtil {
             if (StringUtil.isEmpty(url)) {
                 throw new RuntimeException("无法自动获取jdbcUrl，请在分页插件中配置dialect参数!");
             }
-            String dialectStr = fromJdbcUrl(url);
+            String dialectStr = BaseSqlUtil.fromJdbcUrl(url);
             if (dialectStr == null) {
                 throw new RuntimeException("无法自动获取数据库类型，请通过 dialect 参数指定!");
             }

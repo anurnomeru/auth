@@ -6,7 +6,7 @@ import com.raythonsoft.sso.listener.CustomSessionListener;
 import com.raythonsoft.sso.properties.ShiroProperties;
 import com.raythonsoft.sso.realm.CustomRealm;
 import com.raythonsoft.sso.session.CustomSessionFactory;
-import com.raythonsoft.sso.session.SessionDao;
+import com.raythonsoft.sso.dao.SessionDao;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.realm.AuthorizingRealm;

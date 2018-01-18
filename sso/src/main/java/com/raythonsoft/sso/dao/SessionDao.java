@@ -1,15 +1,18 @@
-package com.raythonsoft.sso.session;
+package com.raythonsoft.sso.dao;
 
-import com.raythonsoft.sso.model.ShiroTypeEnum;
+import com.raythonsoft.common.constant.AuthConstant;
+import com.raythonsoft.common.constant.SsoTypeEnum;
 import com.raythonsoft.sso.common.SsoConstant;
 import com.raythonsoft.sso.model.CustomSession;
 import com.raythonsoft.sso.model.SessionPageInfo;
 import com.raythonsoft.sso.repository.SessionOperationRepository;
+import com.raythonsoft.sso.session.OnlineStatusEnum;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.ValidatingSession;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,7 +24,7 @@ import java.util.Set;
  * Created by Anur IjuoKaruKas on 2018/1/10.
  * Description :
  */
-@Component
+@Repository
 public class SessionDao extends EnterpriseCacheSessionDAO {
 
     @Autowired
@@ -85,13 +88,13 @@ public class SessionDao extends EnterpriseCacheSessionDAO {
     @Override
     protected void doDelete(Session session) {
         String sessionId = String.valueOf(session.getId());
-        String shiroType = String.valueOf(session.getAttribute(SsoConstant.SHIRO_TYPE));// 判断当前session是客户端还是服务器端
+        String ssoType = String.valueOf(session.getAttribute(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_TYPE));// 判断当前session是客户端还是服务器端
 
-        if (ShiroTypeEnum.CLIENT.name().equals(shiroType)) {
+        if (SsoTypeEnum.CLIENT.name().equals(ssoType)) {
             sessionOperationRepository.deleteClientSessionId(sessionId);
         }
 
-        if (ShiroTypeEnum.SERVER.name().equals(shiroType)) {
+        if (SsoTypeEnum.SERVER.name().equals(ssoType)) {
             sessionOperationRepository.deleteServerSessionId(sessionId);
         }
 

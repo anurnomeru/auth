@@ -1,6 +1,6 @@
 package com.raythonsoft.repository.model;
 
-import com.raythonsoft.repository.common.model.PageModel;
+import com.raythonsoft.common.model.PageModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
