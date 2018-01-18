@@ -26,7 +26,7 @@ public class Swagger2Configuration {
                 .groupName("api4web")
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.raythonsoft.auth.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.raythonsoft.repository.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }
