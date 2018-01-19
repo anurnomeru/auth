@@ -1,24 +1,35 @@
 package com.raythonsoft.sso.filter;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.github.pagehelper.util.StringUtil;
 import com.raythonsoft.common.constant.AuthConstant;
 import com.raythonsoft.common.constant.SsoTypeEnum;
+import com.raythonsoft.common.model.Result;
+import com.raythonsoft.common.model.ResultCode;
+import com.raythonsoft.common.model.SsoCode;
 import com.raythonsoft.common.util.PropertiesFileUtil;
 import com.raythonsoft.common.util.RequestParameterUtil;
 import com.raythonsoft.sso.repository.SessionOperationRepository;
 import lombok.extern.log4j.Log4j;
-import org.apache.http.HttpClientConnection;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.AuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -31,6 +42,16 @@ public class CustomAuthenticationFilter extends AuthenticationFilter {
 
     @Autowired
     private SessionOperationRepository sessionOperationRepository;
+
+    private static RestTemplate restTemplate;
+
+    @Autowired
+    private RestTemplate restTemplateAutowired;
+
+    @PostConstruct
+    public void beforeInit() {
+        restTemplate = restTemplateAutowired;
+    }
 
     /**
      * 是否通过认证
@@ -118,12 +139,47 @@ public class CustomAuthenticationFilter extends AuthenticationFilter {
         }
 
         // 判断认证中心是否有code
-        String code = request.getParameter("sso_code");
-        if (StringUtil.isNotEmpty(code)) {
+        String ssoCode = request.getParameter("sso_code");
+        if (StringUtil.isNotEmpty(ssoCode)) {
             StringBuffer ssoServerUrl = new StringBuffer(PropertiesFileUtil
                     .getInstance(AuthConstant.SSO_PROPERTY.getConfigName())
                     .get(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_SERVER_URL));
 
+
+            HttpEntity restTemplateRequestEntity = new HttpEntity(SsoCode.builder().SsoCode(ssoCode).build(), null);
+            ResponseEntity<JSONObject> restTemplateResponse = restTemplate.exchange(ssoServerUrl.toString() + "/sso/code",
+                    HttpMethod.POST,
+                    restTemplateRequestEntity,
+                    JSONObject.class);
+
+            String restTemplateResponseJsonStr = restTemplateResponse.getBody().toJSONString();
+            Result<String> result = JSON.parseObject(restTemplateResponseJsonStr,
+                    new TypeReference<Result<String>>() {
+                    });
+
+            if (result.getCode() != ResultCode.SUCCESS.code) {
+
+            }
+
+
+//                HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+//                CloseableHttpClient closeableHttpClient = httpClientBuilder.build();
+//
+//                HttpPost httpPost = new HttpPost();
+//
+//                List<NameValuePair> nameValuePairList = new ArrayList<>();
+//                nameValuePairList.add(new BasicNameValuePair("code", code));
+//                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairList));
+//
+//                HttpResponse httpResponse = closeableHttpClient.execute(httpPost);
+//
+//                // 如果正确返回了
+//                if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+//                    HttpEntity httpEntity = httpResponse.getEntity();
+//                     EntityUtils.toString(httpEntity);
+//
+//                }
         }
+        return false;
     }
 }

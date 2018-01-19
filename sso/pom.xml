@@ -24,6 +24,8 @@
         <java.version>1.8</java.version>
         <shiro.version>1.3.2</shiro.version>
         <httpclient.version>4.5.4</httpclient.version>
+        <httpasyncclient.version>4.1.3</httpasyncclient.version>
+        <jaxb-api.version>2.3.0</jaxb-api.version>
 
         <!-- 版本太新将导致编译失败 -->
         <lombok.version>1.16.12</lombok.version>
@@ -36,12 +38,7 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
+        <!-- 自定义bean -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
@@ -58,8 +55,8 @@
         <!-- httpClient -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${httpclient.version}</version>
+            <artifactId>httpasyncclient</artifactId>
+            <version>${httpasyncclient.version}</version>
         </dependency>
 
         <!-- lombok -->
@@ -69,6 +66,21 @@
             <version>${lombok.version}</version>
             <scope>compile</scope>
         </dependency>
+
+        <!-- test start -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>${jaxb-api.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- test end -->
     </dependencies>
 
     <build>
