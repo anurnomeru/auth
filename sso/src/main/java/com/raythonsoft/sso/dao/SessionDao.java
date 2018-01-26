@@ -5,6 +5,7 @@ import com.raythonsoft.common.constant.SsoTypeEnum;
 import com.raythonsoft.sso.common.SsoConstant;
 import com.raythonsoft.sso.model.CustomSession;
 import com.raythonsoft.sso.model.SessionPageInfo;
+import com.raythonsoft.sso.repository.CodeRedisRepository;
 import com.raythonsoft.sso.repository.SessionOperationRepository;
 import com.raythonsoft.sso.session.OnlineStatusEnum;
 import org.apache.shiro.session.Session;
@@ -29,6 +30,7 @@ public class SessionDao extends EnterpriseCacheSessionDAO {
 
     @Autowired
     private SessionOperationRepository sessionOperationRepository;
+
 
     /**
      * 创建会话
@@ -100,7 +102,6 @@ public class SessionDao extends EnterpriseCacheSessionDAO {
 
         // 删除shiro下的Session
         sessionOperationRepository.deleteShiroSession(sessionId);
-
     }
 
     /**

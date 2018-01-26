@@ -15,78 +15,12 @@ import java.util.concurrent.TimeUnit;
 public interface SessionOperationRepository {
 
     /**
-     * 生成shiroSessionId
+     * 获取保存在redis的 shiro session
      *
      * @param sessionId
      * @return
      */
-    String genShiroSessionId(Serializable sessionId);
-
-    /**
-     * 生成clientSessionId
-     *
-     * @param sessionId
-     * @return
-     */
-    String genClientSessionId(Serializable sessionId);
-
-    /**
-     * 生成clientSessionIds
-     *
-     * @param code
-     * @return
-     */
-    String genClientSessionIds(String code);
-
-    /**
-     * 生成serverSessionId
-     *
-     * @param sessionId
-     * @return
-     */
-    String genServerSessionId(Serializable sessionId);
-
-    /**
-     * 生成serverSessionIds
-     *
-     * @return
-     */
-    String genServerSessionIds();
-
-    /**
-     * 生成server校验值
-     *
-     * @param code
-     * @return
-     */
-    String genServerCode(String code);
-
-    /**
-     * 从redis获取cacheCode
-     *
-     * @param genningSessionId
-     * @return
-     */
-    String getCodeByGenningSessionId(String genningSessionId);
-
-    /**
-     * 保存从cacheCode到redis
-     *
-     * @param genningSessionId
-     * @param cacheCode
-     * @param timeout
-     * @param timeUnit
-     */
-    void setCodeByGenningSessionId(String genningSessionId, String cacheCode, Integer timeout, TimeUnit timeUnit);
-
-    /**
-     * 刷新cacheCode
-     *
-     * @param genningSessionId
-     * @param timeout
-     * @param timeUnit
-     */
-    void expireCodeByGenningSessionId(String genningSessionId, Integer timeout, TimeUnit timeUnit);
+    CustomSession getShiroSession(Serializable sessionId);
 
     /**
      * 保存sessionId ==> key
@@ -104,14 +38,6 @@ public interface SessionOperationRepository {
      * @param sessionId
      */
     void deleteShiroSession(Serializable sessionId);
-
-    /**
-     * 获取保存在redis的 shiro session
-     *
-     * @param sessionId
-     * @return
-     */
-    CustomSession getShiroSession(Serializable sessionId);
 
     /**
      * 用于删除client会话

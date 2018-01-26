@@ -1,8 +1,8 @@
 package com.raythonsoft.sso.repository.impl;
 
-import com.raythonsoft.sso.common.SsoConstant;
 import com.raythonsoft.sso.model.CustomSession;
-import com.raythonsoft.sso.properties.ShiroProperties;
+import com.raythonsoft.sso.repository.CodeRedisRepository;
+import com.raythonsoft.sso.repository.SessionIdGenerator;
 import com.raythonsoft.sso.repository.SessionOperationRepository;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,65 +26,21 @@ public class SessionOperationRepositoryImpl implements SessionOperationRepositor
     private RedisTemplate<Object, Object> redisTemplate;
 
     @Autowired
-    private ShiroProperties shiroProperties;
+    private SessionIdGenerator sessionIdGenerator;
 
-    @Override
-    public String genShiroSessionId(Serializable sessionId) {
-        return String.format(SsoConstant.ID_FORM, shiroProperties.getAuthShiroSessionId(), sessionId);
-    }
-
-    @Override
-    public String genClientSessionId(Serializable sessionId) {
-        return String.format(SsoConstant.ID_FORM, shiroProperties.getAuthClientSessionId(), sessionId);
-    }
-
-    @Override
-    public String genClientSessionIds(String code) {
-        return String.format(SsoConstant.ID_FORM, shiroProperties.getAuthClientSessionId(), code);
-    }
-
-    @Override
-    public String genServerSessionId(Serializable sessionId) {
-        return String.format(SsoConstant.ID_FORM, shiroProperties.getAuthServerSessionId(), sessionId);
-    }
-
-    @Override
-    public String genServerSessionIds() {
-        return shiroProperties.getAuthServerSessionIds();
-    }
-
-    @Override
-    public String genServerCode(String code) {
-        return String.format(SsoConstant.ID_FORM, shiroProperties.getAuthServerCode(), code);
-    }
-
-    @Override
-    public String getCodeByGenningSessionId(String genningSessionId) {
-        return String.valueOf(redisTemplate.opsForValue().get(genningSessionId));
-    }
-
-    @Override
-    public void setCodeByGenningSessionId(String genningSessionId, String cacheCode, Integer timeout, TimeUnit timeUnit) {
-        redisTemplate.opsForValue().set(genningSessionId, cacheCode, timeout, timeUnit);
-    }
-
-    @Override
-    public void expireCodeByGenningSessionId(String genningSessionId, Integer timeout, TimeUnit timeUnit) {
-        redisTemplate.expire(genningSessionId, timeout, timeUnit);
-    }
-
-////////////////////////////////// 基础操作分界线
+    @Autowired
+    private CodeRedisRepository codeRedisRepository;
 
     @Override
     public CustomSession getShiroSession(Serializable sessionId) {
-        CustomSession customSession = (CustomSession) redisTemplate.opsForValue().get(this.genShiroSessionId(sessionId));
+        CustomSession customSession = (CustomSession) redisTemplate.opsForValue().get(sessionIdGenerator.genShiroSessionId(sessionId));
         log.info(String.format("doReadSession >>>>> sessionId=%s", sessionId));
         return customSession;
     }
 
     @Override
     public void saveOrUpdateShiroSession(CustomSession customSession, Serializable sessionId, boolean isCreate) {
-        redisTemplate.opsForValue().set(this.genShiroSessionId(sessionId), customSession, customSession.getTimeout(), TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(sessionIdGenerator.genShiroSessionId(sessionId), customSession, customSession.getTimeout(), TimeUnit.MILLISECONDS);
         if (isCreate) {
             log.info(String.format("doCreate >>>>> sessionId=%s", sessionId));
         } else {
@@ -95,63 +51,64 @@ public class SessionOperationRepositoryImpl implements SessionOperationRepositor
 
     @Override
     public void deleteShiroSession(Serializable sessionId) {
-        redisTemplate.delete(this.genShiroSessionId(sessionId));
+        redisTemplate.delete(sessionIdGenerator.genShiroSessionId(sessionId));
         log.info(String.format("doDelete >>>>> sessionId=%s", sessionId));
     }
 
     @Override
     public void deleteClientSessionId(String sessionId) {
         // 局部会话code
-        String code = (String) redisTemplate.opsForValue().get(this.genClientSessionId(sessionId));
+        String code = (String) redisTemplate.opsForValue().get(sessionIdGenerator.genClientSessionId(sessionId));
         // 删除局部会话
-        redisTemplate.delete(code);
+        redisTemplate.delete(sessionIdGenerator.genClientSessionId(sessionId));
         // 删除同一个code（server）注册的局部会话
-        redisTemplate.opsForSet().remove(this.genClientSessionIds(code), sessionId);
+        redisTemplate.opsForSet().remove(sessionIdGenerator.genClientSessionIdsCodeParamCode(code), sessionId);
     }
 
     @Override
     public void deleteServerSessionId(String sessionId) {
         // 全局会话code
-        String code = (String) redisTemplate.opsForValue().get(this.genServerSessionId(sessionId));
+        String code = (String) redisTemplate.opsForValue().get(sessionIdGenerator.genServerSessionId(sessionId));
         // 清除全局会话
-        redisTemplate.delete(code);
+        redisTemplate.delete(sessionIdGenerator.genServerSessionId(sessionId));
         // 清除code校验值
-        redisTemplate.delete(this.genServerCode(code));
+        redisTemplate.delete(sessionIdGenerator.genServerCode(code));
 
             /*
              清除该server下所有局部会话
              */
 
         // server下的client会话【们】
-        String clientSessionIdsCode = this.genClientSessionIds(code);
+        String clientSessionIdsCode = sessionIdGenerator.genClientSessionIdsCodeParamCode(code);
         Set<Object> clientSessionIds = redisTemplate.opsForSet().members(clientSessionIdsCode);
         for (Object clientSessionId : clientSessionIds) {
             // server下的client会话
-            deleteClientSessionId(String.valueOf(clientSessionId));
+            this.deleteClientSessionId(String.valueOf(clientSessionId));
         }
 
-        log.info(String.format("当前code=%s，对应的注册系统个数：%s个",
-                code,
-                redisTemplate.opsForSet().size(clientSessionIdsCode)
-                )
-        );
-
+        codeRedisRepository.scardCode(code);// 删除Server后打印一下日志
+        //
+        //  RedisUtil.lrem(ZHENG_UPMS_SERVER_SESSION_IDS, 1, sessionId)
+        //  少了维护会话id列表
+        //
+        // FIXME: 2018/1/26
+        // 将session从ServerSessionIds中删除
         this.deleteSessionFromServerSessionIds(sessionId);
     }
 
     @Override
     public void deleteSessionFromServerSessionIds(String sessionId) {
         // 维护会话id列表，就是把它删掉
-        redisTemplate.opsForSet().remove(this.genServerSessionIds(), sessionId);
+        redisTemplate.opsForSet().remove(sessionIdGenerator.genServerSessionIds(), sessionId);
     }
 
     @Override
     public long getServerCount() {
-        return redisTemplate.opsForList().size(this.genServerSessionIds());
+        return redisTemplate.opsForList().size(sessionIdGenerator.genServerSessionIds());
     }
 
     @Override
     public List<Object> getServerSession(int offset, int limit) {
-        return redisTemplate.opsForList().range(this.genServerSessionIds(), offset, limit);
+        return redisTemplate.opsForList().range(sessionIdGenerator.genServerSessionIds(), offset, limit);
     }
 }
