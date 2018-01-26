@@ -20,7 +20,7 @@ public class CodeGenerator {
     private static String JDBC_DIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
 
     //PACKAGE
-    private static String PACKAGE_BASE = "com.raythonsoft.auth";// 项目基础包名称
+    private static String PACKAGE_BASE = "com.raythonsoft.repository";// 项目基础包名称
     private static String PACKAGE_MODEL = PACKAGE_BASE + ".model";// Model所在包
     private static String PACKAGE_MAPPER = PACKAGE_BASE + ".dao";// Mapper所在包
     private static String PACKAGE_SERVICE = PACKAGE_BASE + ".service";// Service所在包
@@ -28,7 +28,7 @@ public class CodeGenerator {
     private static String PACKAGE_MAPPER_INTERFACE_REFERENCE = PACKAGE_BASE + ".core.Mapper";// Mapper插件基础接口的完全限定名
 
     //PATH
-    private static String PATH_PROJECT = System.getProperty("user.dir");//项目在硬盘上的基础路径
+    private static String PATH_PROJECT = System.getProperty("user.dir")+"/repository";//项目在硬盘上的基础路径
     private static String PATH_TEMPLATE_FILE = PATH_PROJECT + "/src/main/resources/templates";//模板位置
     private static String PATH_SERVICE = PATH_PROJECT + "/src/main/java"; //Service文件路径
     private static String PATH_MAPPER = PATH_PROJECT + "/src/main/java"; //Mapper文件路径

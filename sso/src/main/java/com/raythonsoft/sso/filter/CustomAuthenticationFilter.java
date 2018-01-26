@@ -50,7 +50,6 @@ public class CustomAuthenticationFilter extends AuthenticationFilter {
 
     private static CodeRedisRepository codeRedisRepository;
 
-    private static SessionOperationRepository sessionOperationRepository;
 
     @Autowired
     private SessionIdGenerator sessionIdGeneratorAutowired;
@@ -68,7 +67,6 @@ public class CustomAuthenticationFilter extends AuthenticationFilter {
     public void beforeInit() {
         sessionIdGenerator = sessionIdGeneratorAutowired;
         codeRedisRepository = codeRedisRepositoryAutowired;
-        sessionOperationRepository = sessionOperationRepositoryAutowired;
         restTemplate = restTemplateAutowired;
     }
 
