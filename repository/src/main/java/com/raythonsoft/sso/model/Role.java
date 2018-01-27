@@ -1,13 +1,12 @@
 package com.raythonsoft.sso.model;
 
+import com.raythonsoft.common.model.PageModel;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class Role extends PageModel {
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -26,4 +25,7 @@ public class Role extends PageModel {
     private Integer serverId;
 
     private Integer orders;
+
+    @Transient
+    private PageModel pageModel;
 }

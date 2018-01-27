@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.raythonsoft.sso.dao.SsoLogMapper">
+  <resultMap id="BaseResultMap" type="com.raythonsoft.sso.model.SsoLog">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="sso_log_id" jdbcType="INTEGER" property="ssoLogId" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="method_permissions" jdbcType="VARCHAR" property="methodPermissions" />
+    <result column="method_description" jdbcType="VARCHAR" property="methodDescription" />
+    <result column="user_agent" jdbcType="VARCHAR" property="userAgent" />
+    <result column="request_time" jdbcType="TIMESTAMP" property="requestTime" />
+    <result column="request_uri" jdbcType="VARCHAR" property="requestUri" />
+    <result column="request_method" jdbcType="VARCHAR" property="requestMethod" />
+    <result column="request_param" jdbcType="VARCHAR" property="requestParam" />
+    <result column="request_ip" jdbcType="VARCHAR" property="requestIp" />
+  </resultMap>
+</mapper>

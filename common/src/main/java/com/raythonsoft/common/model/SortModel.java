@@ -1,9 +1,7 @@
-package com.raythonsoft.sso.model;
+package com.raythonsoft.common.model;
 
 import com.github.pagehelper.util.StringUtil;
 import lombok.Data;
-
-import javax.persistence.Transient;
 
 /**
  * Created by Anur IjuoKaruKas on 2017/10/6.
@@ -11,10 +9,8 @@ import javax.persistence.Transient;
  */
 @Data
 public class SortModel {
-    @Transient
     private String orderBy; // 排列字段、
 
-    @Transient
     private String sort; // asc desc 等。
 
     public String orderSql() {

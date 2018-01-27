@@ -1,8 +1,7 @@
-package com.raythonsoft.sso.model;
+package com.raythonsoft.common.model;
 
 import lombok.Data;
 
-import javax.persistence.Transient;
 
 
 /**
@@ -12,13 +11,10 @@ import javax.persistence.Transient;
 @Data
 public class PageModel {
 
-    @Transient
     Integer pageNum = 1;// 默认第一页
 
-    @Transient
     Integer pageSize = 10;// 十条
 
-    @Transient
     SortModel sortModel = new SortModel();
 
     /**

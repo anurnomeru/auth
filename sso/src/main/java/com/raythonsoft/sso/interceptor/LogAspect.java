@@ -2,6 +2,8 @@ package com.raythonsoft.sso.interceptor;
 
 import com.alibaba.fastjson.JSON;
 import com.raythonsoft.common.util.NetworkUtil;
+import com.raythonsoft.sso.model.SsoLog;
+import com.raythonsoft.sso.service.SsoLogService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -29,8 +31,10 @@ import java.util.Map;
 @Component
 public class LogAspect {
 
+    // FIXME: 2018/1/27 待优化 ，看起来好像没有什么实际作用
+
     @Autowired
-    private LoggerService loggerService;
+    private SsoLogService ssoLogService;
 
     @Pointcut("execution(* *..controller..*.*(..))")
     public void log() {
@@ -40,19 +44,19 @@ public class LogAspect {
     public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
-        SsoLog log = SsoLog.builder()
-                .ip(NetworkUtil.getIpAddress(request))
-                .method(request.getMethod())
-                .operationTime(new Date())
-                .uri(request.getRequestURI())
+        SsoLog ssoLog = SsoLog.builder()
+                .requestIp(NetworkUtil.getIpAddress(request))
+                .requestMethod(request.getMethod())
+                .requestTime(new Date())
+                .requestUri(request.getRequestURI())
                 .userAgent(request.getHeader("User-Agent"))
-                .username(JSON.toJSONString(request.getUserPrincipal())).build();
+                .userName(JSON.toJSONString(request.getUserPrincipal())).build();
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
 
         if (method.isAnnotationPresent(ApiOperation.class)) {
-            log.setDescription(method.getAnnotation(ApiOperation.class).value());
+            ssoLog.setMethodDescription(method.getAnnotation(ApiOperation.class).value());
         }
 
         if (method.isAnnotationPresent(RequiresPermissions.class)) {
@@ -70,17 +74,16 @@ public class LogAspect {
                     count++;
                 }
             }
-            log.setPermissions(permissionsStr.toString());
+            ssoLog.setMethodPermissions(permissionsStr.toString());
         }
 
         Map paramMap = request.getParameterMap();
         if (paramMap.size() == 0) {
-            log.setParam(request.getQueryString());
+            ssoLog.setRequestParam(request.getQueryString());
         } else {
-            log.setParam(JSON.toJSONString(request.getParameterMap()));
+            ssoLog.setRequestParam(JSON.toJSONString(request.getParameterMap()));
         }
-//        loggerService.save(log);
-
+        ssoLogService.save(ssoLog);
         return joinPoint.proceed();
     }
 }

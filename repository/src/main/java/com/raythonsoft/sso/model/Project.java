@@ -1,16 +1,18 @@
 package com.raythonsoft.sso.model;
 
+import com.raythonsoft.common.model.PageModel;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class Project extends PageModel {
+public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String name;
+
+    @Transient
+    private PageModel pageModel;
 }
