@@ -33,6 +33,8 @@ public class SessionOperationRepositoryImpl implements SessionOperationRepositor
 
     @Override
     public CustomSession getShiroSession(Serializable sessionId) {
+
+        Object o = redisTemplate.opsForValue().get(sessionIdGenerator.genShiroSessionId(sessionId));
         CustomSession customSession = (CustomSession) redisTemplate.opsForValue().get(sessionIdGenerator.genShiroSessionId(sessionId));
         log.info(String.format("doReadSession >>>>> sessionId=%s", sessionId));
         return customSession;

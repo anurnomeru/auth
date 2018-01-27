@@ -23,19 +23,25 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <shiro.version>1.3.2</shiro.version>
-        <httpclient.version>4.5.4</httpclient.version>
-        <httpasyncclient.version>4.1.3</httpasyncclient.version>
         <jaxb-api.version>2.3.0</jaxb-api.version>
+        <swagger2.version>2.7.0</swagger2.version>
 
         <!-- 版本太新将导致编译失败 -->
         <lombok.version>1.16.12</lombok.version>
     </properties>
 
     <dependencies>
+        <!-- 权限表 repository -->
         <dependency>
             <groupId>com.raythonsoft</groupId>
             <artifactId>repository</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <!-- aop 支持 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
         <!-- 自定义bean -->
@@ -45,6 +51,12 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
         <!--  shiro  -->
         <dependency>
             <groupId>org.apache.shiro</groupId>
@@ -52,11 +64,16 @@
             <version>${shiro.version}</version>
         </dependency>
 
-        <!-- httpClient -->
+        <!--Swagger2 JSON API documentation for spring based applications-->
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpasyncclient</artifactId>
-            <version>${httpasyncclient.version}</version>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${swagger2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${swagger2.version}</version>
         </dependency>
 
         <!-- lombok -->

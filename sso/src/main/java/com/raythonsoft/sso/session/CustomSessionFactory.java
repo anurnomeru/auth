@@ -1,6 +1,6 @@
 package com.raythonsoft.sso.session;
 
-import com.raythonsoft.repository.util.NetworkUtil;
+import com.raythonsoft.common.util.NetworkUtil;
 import com.raythonsoft.sso.model.CustomSession;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.SessionContext;

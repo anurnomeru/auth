@@ -1,12 +1,12 @@
 package com.raythonsoft.sso.realm;
 
 import com.github.pagehelper.util.StringUtil;
-import com.raythonsoft.repository.model.Resources;
-import com.raythonsoft.repository.model.Role;
-import com.raythonsoft.repository.model.User;
-import com.raythonsoft.repository.service.ResourcesService;
-import com.raythonsoft.repository.service.RoleService;
-import com.raythonsoft.repository.service.UserService;
+import com.raythonsoft.sso.model.Resources;
+import com.raythonsoft.sso.model.Role;
+import com.raythonsoft.sso.model.User;
+import com.raythonsoft.sso.service.ResourcesService;
+import com.raythonsoft.sso.service.RoleService;
+import com.raythonsoft.sso.service.UserService;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;

@@ -1,6 +1,6 @@
 package com.raythonsoft;
 
-import com.raythonsoft.repository.RepositoryApplication;
+import com.raythonsoft.sso.RepositoryApplication;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,12 +1,14 @@
 package com.raythonsoft.sso.properties;
 
 import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * Created by Anur IjuoKaruKas on 2018/1/10.
  * Description :
  */
 @Data
+@ConfigurationProperties(prefix = "shiro")
 public class ShiroProperties {
 
     private String authShiroSessionId;

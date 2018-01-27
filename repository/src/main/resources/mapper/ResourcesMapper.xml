@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.raythonsoft.repository.dao.ResourcesMapper">
-    <resultMap id="BaseResultMap" type="com.raythonsoft.repository.model.Resources">
+<mapper namespace="com.raythonsoft.sso.dao.ResourcesMapper">
+    <resultMap id="BaseResultMap" type="com.raythonsoft.sso.model.Resources">
         <!--
           WARNING - @mbg.generated
         -->
