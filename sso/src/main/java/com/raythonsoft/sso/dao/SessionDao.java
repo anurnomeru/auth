@@ -5,14 +5,12 @@ import com.raythonsoft.common.constant.SsoTypeEnum;
 import com.raythonsoft.sso.common.SsoConstant;
 import com.raythonsoft.sso.model.CustomSession;
 import com.raythonsoft.sso.model.SessionPageInfo;
-import com.raythonsoft.sso.repository.CodeRedisRepository;
 import com.raythonsoft.sso.repository.SessionOperationRepository;
 import com.raythonsoft.sso.session.OnlineStatusEnum;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.ValidatingSession;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
@@ -40,7 +38,6 @@ public class SessionDao extends EnterpriseCacheSessionDAO {
      */
     @Override
     protected Serializable doCreate(Session session) {
-        // fixme 不知道这个具体是什么意思，大概从sessionFactory创建一个session
         Serializable sessionId = generateSessionId(session);
         assignSessionId(session, sessionId);
 
@@ -113,15 +110,15 @@ public class SessionDao extends EnterpriseCacheSessionDAO {
      * @return
      */
     public SessionPageInfo getActiveSessions(int offset, int limit) {
-        long total = sessionOperationRepository.getServerCount();
+        long total = sessionOperationRepository.getServerSessionCount();
 
         // fixme 分页存疑
-        List<Object> sessionIdList = sessionOperationRepository.getServerSession(offset, limit);
+        List<Object> sessionIdList = sessionOperationRepository.getServerSessionList(offset, limit);
         List<Session> sessionList = new ArrayList<>();
         for (Object sessionId : sessionIdList) {
             Session session = sessionOperationRepository.getShiroSession((String) sessionId);
             if (null == session) {
-                sessionOperationRepository.deleteSessionFromServerSessionIds((String) sessionId);
+                sessionOperationRepository.leftRemFromServerSessionIds((String) sessionId, 1);
                 total = total - 1;
                 continue;
             }

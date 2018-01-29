@@ -1,4 +1,4 @@
-package com.raythonsoft.sso.config;
+package com.raythonsoft.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +26,7 @@ public class Swagger2Configuration {
                 .groupName("api4web")
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.raythonsoft.repository.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.raythonsoft.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }

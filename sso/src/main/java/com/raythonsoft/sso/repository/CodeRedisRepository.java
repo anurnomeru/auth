@@ -28,6 +28,16 @@ public interface CodeRedisRepository {
     void setCodeByGenningSessionId(String genningSessionId, String code, Integer timeout, TimeUnit timeUnit);
 
     /**
+     * 初始化code
+     *
+     * @param genningCode
+     * @param code
+     * @param timeout
+     * @param timeUnit
+     */
+    void setCode(String genningCode, String code, Integer timeout, TimeUnit timeUnit);
+
+    /**
      * 更新cacheCode【超时时间（一般是这样）】（更新同一个code下所有局部会话key）
      *
      * @param code

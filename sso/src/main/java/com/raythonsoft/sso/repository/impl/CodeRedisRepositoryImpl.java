@@ -32,6 +32,11 @@ public class CodeRedisRepositoryImpl implements CodeRedisRepository {
     }
 
     @Override
+    public void setCode(String genningCode, String code, Integer timeout, TimeUnit timeUnit) {
+        redisTemplate.opsForValue().set(genningCode, code, timeout, timeUnit);
+    }
+
+    @Override
     public void expireCode(String code, Integer timeout, TimeUnit timeUnit) {
         redisTemplate.expire(code, timeout, timeUnit);
     }
@@ -43,7 +48,7 @@ public class CodeRedisRepositoryImpl implements CodeRedisRepository {
     }
 
     @Override
-    public void scardCode(String code){
+    public void scardCode(String code) {
         log.info(String.format("当前code=%s，对应的注册系统个数：%s个",
                 code,
                 redisTemplate.opsForSet().size(code)

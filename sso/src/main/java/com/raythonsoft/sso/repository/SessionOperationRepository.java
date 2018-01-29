@@ -1,6 +1,7 @@
 package com.raythonsoft.sso.repository;
 
 import com.raythonsoft.sso.model.CustomSession;
+import com.raythonsoft.sso.session.OnlineStatusEnum;
 
 import java.io.Serializable;
 import java.util.List;
@@ -30,6 +31,15 @@ public interface SessionOperationRepository {
     void saveOrUpdateShiroSession(CustomSession customSession, Serializable sessionId, boolean isCreate);
 
     /**
+     * 更新在线状态
+     *
+     * @param sessionId
+     * @param onlineStatusEnum
+     */
+    void updateShiroSessionStatus(Serializable sessionId, OnlineStatusEnum onlineStatusEnum);
+
+
+    /**
      * 删除保存在redis的 shiro session
      *
      * @param sessionId
@@ -51,23 +61,25 @@ public interface SessionOperationRepository {
     void deleteServerSessionId(String sessionId);
 
     /**
-     * 将sessionId从某服务列表删掉
+     * 向 Redis 全局 session 列表左 push
      *
      * @param sessionId
      */
-    void deleteSessionFromServerSessionIds(String sessionId);
+    void leftPushIntoServerSessionId(Serializable sessionId);
 
     /**
      * 获取当前的总服务器数
      *
      * @return
      */
-    long getServerCount();
+    long getServerSessionCount();
 
     /**
      * 获取当前服务器的id
      *
+     * @param offset
+     * @param limit
      * @return
      */
-    List<Object> getServerSession(int offset, int limit);
+    List<Object> getServerSessionList(int offset, int limit);
 }

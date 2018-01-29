@@ -4,6 +4,7 @@ import com.raythonsoft.sso.model.CustomSession;
 import com.raythonsoft.sso.repository.CodeRedisRepository;
 import com.raythonsoft.sso.repository.SessionIdGenerator;
 import com.raythonsoft.sso.repository.SessionOperationRepository;
+import com.raythonsoft.sso.session.OnlineStatusEnum;
 import com.raythonsoft.sso.util.SerializableUtil;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,13 @@ public class SessionOperationRepositoryImpl implements SessionOperationRepositor
     }
 
     @Override
+    public void updateShiroSessionStatus(Serializable sessionId, OnlineStatusEnum onlineStatusEnum) {
+        CustomSession customSession = this.getShiroSession(sessionId);
+        customSession.setOnlineStatusEnum(onlineStatusEnum);
+        this.saveOrUpdateShiroSession(customSession, sessionId, false);
+    }
+
+    @Override
     public void deleteShiroSession(Serializable sessionId) {
         redisTemplate.delete(sessionIdGenerator.genShiroSessionId(sessionId));
         log.debug(String.format("doDelete >>>>> sessionId=%s", sessionId));
@@ -88,28 +96,34 @@ public class SessionOperationRepositoryImpl implements SessionOperationRepositor
         }
 
         codeRedisRepository.scardCode(code);// 删除Server后打印一下日志
-        //
-        //  RedisUtil.lrem(ZHENG_UPMS_SERVER_SESSION_IDS, 1, sessionId)
-        //  少了维护会话id列表
-        //
-        // FIXME: 2018/1/26
-        // 将session从ServerSessionIds中删除
-        this.deleteSessionFromServerSessionIds(sessionId);
+
+        this.leftRemFromServerSessionIds(sessionId, 1);// leftRem 从全局会话中，删除这个sessionId
+    }
+
+    /**
+     * 【 内部方法 不可直接将全局会话删除 】
+     * 将 sessionId 从 Redis 全局 session 列表左 rem
+     *
+     * @param sessionId
+     * @param count
+     */
+    private void leftRemFromServerSessionIds(String sessionId, Integer count) {
+        // leftRem 从全局会话中，删除这个sessionId
+        redisTemplate.opsForList().remove(sessionIdGenerator.genServerSessionIds(), count, sessionId);
     }
 
     @Override
-    public void deleteSessionFromServerSessionIds(String sessionId) {
-        // 维护会话id列表，就是把它删掉
-        redisTemplate.opsForSet().remove(sessionIdGenerator.genServerSessionIds(), sessionId);
+    public void leftPushIntoServerSessionId(Serializable sessionId) {
+        redisTemplate.opsForList().leftPush(sessionIdGenerator.genServerSessionIds(), sessionId);
     }
 
     @Override
-    public long getServerCount() {
+    public long getServerSessionCount() {
         return redisTemplate.opsForList().size(sessionIdGenerator.genServerSessionIds());
     }
 
     @Override
-    public List<Object> getServerSession(int offset, int limit) {
+    public List<Object> getServerSessionList(int offset, int limit) {
         return redisTemplate.opsForList().range(sessionIdGenerator.genServerSessionIds(), offset, limit);
     }
 }
