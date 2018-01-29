@@ -1,12 +1,9 @@
 package com.raythonsoft.sso.repository;
 
-import com.raythonsoft.sso.common.SsoConstant;
 import com.raythonsoft.sso.model.CustomSession;
-import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Anur IjuoKaruKas on 2018/1/16.

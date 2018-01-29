@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Created by Anur IjuoKaruKas on 2018/1/11.
  * Description : 把spring-boot默认的json解析器由Jenkins换为fastjson

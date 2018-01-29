@@ -13,7 +13,6 @@ import java.util.Map;
  * Created by Anur IjuoKaruKas on 2018/1/11.
  * Description :
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
 public class CustomSession extends SimpleSession {
     private String userAgent;

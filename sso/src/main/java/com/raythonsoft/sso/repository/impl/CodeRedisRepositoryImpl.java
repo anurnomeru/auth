@@ -21,9 +21,6 @@ public class CodeRedisRepositoryImpl implements CodeRedisRepository {
     @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
 
-    @Autowired
-    private ShiroProperties shiroProperties;
-
     @Override
     public String getCodeByGenningSessionId(String genningSessionId) {
         return String.valueOf(redisTemplate.opsForValue().get(genningSessionId));

@@ -71,6 +71,7 @@ public class SessionDao extends EnterpriseCacheSessionDAO {
         if (session instanceof ValidatingSession && !((ValidatingSession) session).isValid()) {
             return;
         }
+
         // 更新访问时间
         CustomSession customSession = (CustomSession) session;
         CustomSession cacheSession = (CustomSession) doReadSession(session.getId());

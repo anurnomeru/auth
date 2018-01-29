@@ -29,7 +29,6 @@ import org.springframework.context.annotation.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Created by Anur IjuoKaruKas on 2018/1/9.
  * Description :
@@ -191,8 +190,8 @@ public class ShiroConfiguration {
     public CookieRememberMeManager cookieRememberMeManager() {
         CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
         // rememberMe cookie加密的密钥 建议每个项目都不一样 默认AES算法 密钥长度（128 256 512 位）
+        cookieRememberMeManager.setCookie(rememberMeCookie());
         cookieRememberMeManager.setCipherKey(Base64.decode(shiroProperties().getRememberMeCipherKey()));
-        cookieRememberMeManager.setCookie(sessionIdCookie());
         return cookieRememberMeManager;
     }
 

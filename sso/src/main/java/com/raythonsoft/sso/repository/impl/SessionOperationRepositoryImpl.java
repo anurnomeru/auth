@@ -4,6 +4,7 @@ import com.raythonsoft.sso.model.CustomSession;
 import com.raythonsoft.sso.repository.CodeRedisRepository;
 import com.raythonsoft.sso.repository.SessionIdGenerator;
 import com.raythonsoft.sso.repository.SessionOperationRepository;
+import com.raythonsoft.sso.util.SerializableUtil;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -33,28 +34,26 @@ public class SessionOperationRepositoryImpl implements SessionOperationRepositor
 
     @Override
     public CustomSession getShiroSession(Serializable sessionId) {
-
-        Object o = redisTemplate.opsForValue().get(sessionIdGenerator.genShiroSessionId(sessionId));
-        CustomSession customSession = (CustomSession) redisTemplate.opsForValue().get(sessionIdGenerator.genShiroSessionId(sessionId));
-        log.info(String.format("doReadSession >>>>> sessionId=%s", sessionId));
+        CustomSession customSession = (CustomSession) SerializableUtil.deserialize((String) redisTemplate.opsForValue().get(sessionIdGenerator.genShiroSessionId(sessionId)));
+        log.debug(String.format("doReadSession >>>>> sessionId=%s", sessionId));
         return customSession;
     }
 
     @Override
     public void saveOrUpdateShiroSession(CustomSession customSession, Serializable sessionId, boolean isCreate) {
-        redisTemplate.opsForValue().set(sessionIdGenerator.genShiroSessionId(sessionId), customSession, customSession.getTimeout(), TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(sessionIdGenerator.genShiroSessionId(sessionId), SerializableUtil.serialize(customSession), customSession.getTimeout(), TimeUnit.MILLISECONDS);
         if (isCreate) {
-            log.info(String.format("doCreate >>>>> sessionId=%s", sessionId));
+            log.debug(String.format("doCreate >>>>> sessionId=%s", sessionId));
         } else {
-            log.info(String.format("doUpdate >>>>> sessionId=%s", sessionId));
+            log.debug(String.format("doUpdate >>>>> sessionId=%s", sessionId));
         }
-        log.info(String.format("status >>>>> onlineStatus=%s", customSession.getOnlineStatusEnum()));
+        log.debug(String.format("status >>>>> onlineStatus=%s", customSession.getOnlineStatusEnum()));
     }
 
     @Override
     public void deleteShiroSession(Serializable sessionId) {
         redisTemplate.delete(sessionIdGenerator.genShiroSessionId(sessionId));
-        log.info(String.format("doDelete >>>>> sessionId=%s", sessionId));
+        log.debug(String.format("doDelete >>>>> sessionId=%s", sessionId));
     }
 
     @Override
