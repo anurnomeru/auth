@@ -1,4 +1,4 @@
-package com.raythonsoft.sso.controller;
+package com.raythonsoft.controller;
 
 import com.raythonsoft.common.model.Result;
 import com.raythonsoft.common.util.ResultGenerator;
