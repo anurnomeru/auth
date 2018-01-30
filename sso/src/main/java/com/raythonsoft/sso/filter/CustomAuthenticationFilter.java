@@ -156,17 +156,17 @@ public class CustomAuthenticationFilter extends AuthenticationFilter {
         int timeOut = (int) session.getTimeout() / 1000;
 
         // 判断局部会话是否已经登陆
-        String cacheCode = codeRedisRepository.getCodeByGenningSessionId(sessionIdGenerator.genShiroSessionId(sessionId));
-        if (cacheCode != null) {// 如果已经登陆过
+        String checkCodeFromRedis = codeRedisRepository.getCheckCodeByGenningSessionId(sessionIdGenerator.genShiroSessionId(sessionId));
+        if (checkCodeFromRedis != null) {// 如果已经登陆过
             // 更新session有效期
-            codeRedisRepository.setCodeByGenningSessionId(// 更新该session在局部会话的有效期
+            codeRedisRepository.setCheckCodeIntoGenningSessionId(// 更新该session在局部会话的有效期
                     sessionIdGenerator.genClientSessionId(sessionId),
-                    cacheCode,
+                    checkCodeFromRedis,
                     timeOut,
                     TimeUnit.SECONDS);
 
-            codeRedisRepository.expireCode(// 更新该session所属 code下局部会话 Set 中
-                    sessionIdGenerator.genClientSessionIdsCodeParamCode(cacheCode),
+            codeRedisRepository.expireCacheCode(// 更新该session所属 code下局部会话 Set 的有效期
+                    sessionIdGenerator.genClientSessionIdsCodeParamCode(checkCodeFromRedis),
                     timeOut,
                     TimeUnit.SECONDS);
 
@@ -184,15 +184,15 @@ public class CustomAuthenticationFilter extends AuthenticationFilter {
         }
 
         // 判断认证中心是否有sso_code
-        String ssoCode = request.getParameter(AuthConstant.REQUEST_PARAM_OSS_CODE);
-        if (StringUtil.isNotEmpty(ssoCode)) {// 如果没有登陆过，但是请求带了sso_code
+        String checkCodeFromRequest = request.getParameter(AuthConstant.REQUEST_PARAM_OSS_CODE);
+        if (StringUtil.isNotEmpty(checkCodeFromRequest)) {// 如果没有登陆过，但是请求带了sso_code
             // 获取回调地址
             String ssoServerUrl = PropertiesFileUtil
                     .getInstance(AuthConstant.SSO_PROPERTY.getPropertyFileName())
                     .get(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_SERVER_URL);
 
             // 校验code
-            HttpEntity<SsoCode> restTemplateRequestEntity = new HttpEntity<>(SsoCode.builder().SsoCode(ssoCode).build(), null);
+            HttpEntity<SsoCode> restTemplateRequestEntity = new HttpEntity<>(SsoCode.builder().checkCode(checkCodeFromRequest).build(), null);
             ResponseEntity<JSONObject> restTemplateResponse = restTemplate.exchange(ssoServerUrl + AuthConstant.URL_SSO_CODE,
                     HttpMethod.POST,
                     restTemplateRequestEntity,
@@ -203,20 +203,20 @@ public class CustomAuthenticationFilter extends AuthenticationFilter {
                     new TypeReference<Result<String>>() {
                     });
 
-            if (result.getCode() == ResultCode.SUCCESS.code && ssoCode.equals(result.getData())) {// 如果code校验成功
-                codeRedisRepository.setCodeByGenningSessionId(// 注册sessionId到局部会话
+            if (result.getCode() == ResultCode.SUCCESS.code && checkCodeFromRequest.equals(result.getData())) {// 如果code校验成功
+                codeRedisRepository.setCheckCodeIntoGenningSessionId(// 创建局部会话
                         sessionIdGenerator.genClientSessionId(sessionId),
-                        ssoCode,
+                        checkCodeFromRequest,
                         timeOut,
                         TimeUnit.SECONDS
                 );
-                codeRedisRepository.saddCode(// 将sessionId保存到该code下的局部会话 Set 中
-                        sessionIdGenerator.genClientSessionIdsCodeParamCode(ssoCode),
+                codeRedisRepository.saddCacheCode(// 将sessionId保存到该code下的局部会话 Set 中
+                        sessionIdGenerator.genClientSessionIdsCodeParamCode(checkCodeFromRequest),
                         sessionId,
                         timeOut,
                         TimeUnit.SECONDS);
 
-                codeRedisRepository.scardCode(sessionIdGenerator.genClientSessionIdsCodeParamCode(ssoCode));// 打印 code 下注册的系统
+                codeRedisRepository.scardCacheCode(sessionIdGenerator.genClientSessionIdsCodeParamCode(checkCodeFromRequest));// 打印 code 下注册的系统
 
                 String ssoUsername = request.getParameter(AuthConstant.REQUEST_PARAM_OSS_USERNAME);
                 String backUrl = RequestParameterUtil.getUrlWithOutCodeAndName(WebUtils.toHttp(request));// 移除sso_code和sso_username

@@ -6,45 +6,55 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Anur IjuoKaruKas on 2018/1/26.
  * Description :
+ * CheckCode ： 原始code
+ * CacheCode ： 维护会话列表的code（由checkCode加上标识）
  */
 public interface CodeRedisRepository {
 
     /**
-     * 从redis获取cacheCode
+     * 根据会话，获取checkCode
      *
      * @param genningSessionId
      * @return
      */
-    String getCodeByGenningSessionId(String genningSessionId);
+    String getCheckCodeByGenningSessionId(String genningSessionId);
 
     /**
-     * 保存sessionId 到 code 中
+     * 创建会话，将checkCode保存在sessionId下
      *
      * @param genningSessionId
-     * @param code
+     * @param checkCode
      * @param timeout
      * @param timeUnit
      */
-    void setCodeByGenningSessionId(String genningSessionId, String code, Integer timeout, TimeUnit timeUnit);
+    void setCheckCodeIntoGenningSessionId(String genningSessionId, String checkCode, Integer timeout, TimeUnit timeUnit);
 
     /**
-     * 初始化code
+     * 初始化checkCode
      *
-     * @param genningCode
-     * @param code
+     * @param checkCode
      * @param timeout
      * @param timeUnit
      */
-    void setCode(String genningCode, String code, Integer timeout, TimeUnit timeUnit);
+    void setCheckCode(String checkCode, Integer timeout, TimeUnit timeUnit);
 
     /**
-     * 更新cacheCode【超时时间（一般是这样）】（更新同一个code下所有局部会话key）
+     * 删除checkCode
+     *
+     * @param checkCode
+     */
+    void removeCheckCode(String checkCode);
+
+    /**
+     * 刷新该SessionIds <Set> 的超时时间
+     * key ： code
+     * value ：sessionId（局部）
      *
      * @param code
      * @param timeout
      * @param timeUnit
      */
-    void expireCode(String code, Integer timeout, TimeUnit timeUnit);
+    void expireCacheCode(String code, Integer timeout, TimeUnit timeUnit);
 
     /**
      * 向该SessionIds的 <Set> 下添加元素，并更新超时时间
@@ -54,12 +64,12 @@ public interface CodeRedisRepository {
      * @param timeout
      * @param timeUnit
      */
-    void saddCode(String code, Serializable sessionId, Integer timeout, TimeUnit timeUnit);
+    void saddCacheCode(String code, Serializable sessionId, Integer timeout, TimeUnit timeUnit);
 
     /**
      * 查询code下剩余注册个数
      *
      * @param code
      */
-    void scardCode(String code);
+    void scardCacheCode(String code);
 }

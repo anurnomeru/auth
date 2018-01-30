@@ -2,9 +2,11 @@ package com.raythonsoft.controller;
 
 import com.raythonsoft.common.constant.AuthConstant;
 import com.raythonsoft.common.model.Result;
+import com.raythonsoft.sso.model.Project;
 import com.raythonsoft.sso.repository.CodeRedisRepository;
 import com.raythonsoft.sso.repository.SessionIdGenerator;
 import com.raythonsoft.sso.repository.SessionOperationRepository;
+import com.raythonsoft.sso.service.ProjectService;
 import com.raythonsoft.sso.session.OnlineStatusEnum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,6 +44,9 @@ public class SsoController {
     @Autowired
     private SessionOperationRepository sessionOperationRepository;
 
+    @Autowired
+    private ProjectService projectService;
+
     @ApiOperation(value = "登陆")
     @GetMapping("/login")
     public String login(String backUrl) {
@@ -49,10 +54,11 @@ public class SsoController {
         Session session = subject.getSession();
         String serverSessionId = String.valueOf(session.getId());
 
-        String ossCode = codeRedisRepository.getCodeByGenningSessionId(sessionIdGenerator.genServerCode(serverSessionId));// 全局会话session
+        // 全局会话checkCode
+        String checkCode = codeRedisRepository.getCheckCodeByGenningSessionId(sessionIdGenerator.genServerCode(serverSessionId));// 全局会话session
 
         // 如果全局会话session已经登陆
-        if (!StringUtils.isEmpty(ossCode)) {
+        if (!StringUtils.isEmpty(checkCode)) {
             String ossUsername = (String) subject.getPrincipal();
             if (StringUtils.isEmpty(backUrl)) {
                 backUrl = "/";
@@ -62,7 +68,7 @@ public class SsoController {
                 } else {
                     backUrl += "?";
                 }
-                backUrl += String.format("%s=%s&%s=%s", AuthConstant.REQUEST_PARAM_OSS_CODE, ossCode, AuthConstant.REQUEST_PARAM_OSS_USERNAME, ossUsername);
+                backUrl += String.format("%s=%s&%s=%s", AuthConstant.REQUEST_PARAM_OSS_CODE, checkCode, AuthConstant.REQUEST_PARAM_OSS_USERNAME, ossUsername);
             }
             log.debug(String.format("认证中心账号通过，带code会跳：%s", backUrl));
             return "redirect:" + backUrl;
@@ -70,12 +76,12 @@ public class SsoController {
         return "";/// FIXME: 2018/1/29 登陆界面
     }
 
-    public Result login(@RequestParam String username, @RequestParam String password, @RequestParam(required = false, defaultValue = "false") boolean rememberMe) {
+    public Result login(@RequestParam String username, @RequestParam String password, @RequestParam(required = false, defaultValue = "false") boolean rememberMe, String backUrl) {
         Subject subject = SecurityUtils.getSubject();
         Session session = subject.getSession();
         String serverSessionId = String.valueOf(session.getId());
 
-        String ossCode = codeRedisRepository.getCodeByGenningSessionId(sessionIdGenerator.genServerCode(serverSessionId));// 全局会话session
+        String ossCode = codeRedisRepository.getCheckCodeByGenningSessionId(sessionIdGenerator.genServerCode(serverSessionId));// 全局会话session
 
         // 如果全局会话session已经登陆
         if (StringUtils.isEmpty(ossCode)) {
@@ -89,12 +95,15 @@ public class SsoController {
             // 维护全局会话的sessionId列表
             sessionOperationRepository.leftPushIntoServerSessionId(serverSessionId);
 
-            String code = String.valueOf(UUID.randomUUID());
+            String checkCode = String.valueOf(UUID.randomUUID());
 
             // 维护全局会话的code
-            codeRedisRepository.setCodeByGenningSessionId(sessionIdGenerator.genServerSessionId(serverSessionId), code, (int) session.getTimeout() / 1000, TimeUnit.SECONDS);
-            // 维护该 code 的校验值 //fixme code 存疑？
-            codeRedisRepository.setCode(sessionIdGenerator.genServerCode(code), code, (int) session.getTimeout() / 1000, TimeUnit.SECONDS);
+            codeRedisRepository.setCheckCodeIntoGenningSessionId(sessionIdGenerator.genServerSessionId(serverSessionId), checkCode, (int) session.getTimeout() / 1000, TimeUnit.SECONDS);
+            // 初始化 code 的校验值
+            codeRedisRepository.setCheckCode(checkCode, (int) session.getTimeout() / 1000, TimeUnit.SECONDS);
+        }
+        if (!StringUtils.isEmpty(backUrl)) {
+            Project project = projectService.findby
         }
     }
 

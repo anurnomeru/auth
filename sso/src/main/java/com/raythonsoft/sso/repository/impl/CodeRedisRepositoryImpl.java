@@ -1,7 +1,7 @@
 package com.raythonsoft.sso.repository.impl;
 
-import com.raythonsoft.sso.properties.ShiroProperties;
 import com.raythonsoft.sso.repository.CodeRedisRepository;
+import com.raythonsoft.sso.repository.SessionIdGenerator;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,34 +21,42 @@ public class CodeRedisRepositoryImpl implements CodeRedisRepository {
     @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
 
+    @Autowired
+    private SessionIdGenerator sessionIdGenerator;
+
     @Override
-    public String getCodeByGenningSessionId(String genningSessionId) {
+    public String getCheckCodeByGenningSessionId(String genningSessionId) {
         return String.valueOf(redisTemplate.opsForValue().get(genningSessionId));
     }
 
     @Override
-    public void setCodeByGenningSessionId(String genningSessionId, String code, Integer timeout, TimeUnit timeUnit) {
-        redisTemplate.opsForValue().set(genningSessionId, code, timeout, timeUnit);
+    public void setCheckCodeIntoGenningSessionId(String genningSessionId, String checkCode, Integer timeout, TimeUnit timeUnit) {
+        redisTemplate.opsForValue().set(genningSessionId, checkCode, timeout, timeUnit);
     }
 
     @Override
-    public void setCode(String genningCode, String code, Integer timeout, TimeUnit timeUnit) {
-        redisTemplate.opsForValue().set(genningCode, code, timeout, timeUnit);
+    public void setCheckCode(String checkCode, Integer timeout, TimeUnit timeUnit) {
+        redisTemplate.opsForValue().set(sessionIdGenerator.genServerCode(checkCode), checkCode, timeout, timeUnit);
     }
 
     @Override
-    public void expireCode(String code, Integer timeout, TimeUnit timeUnit) {
+    public void removeCheckCode(String checkCode) {
+        redisTemplate.delete(sessionIdGenerator.genServerCode(checkCode));
+    }
+
+    @Override
+    public void expireCacheCode(String code, Integer timeout, TimeUnit timeUnit) {
         redisTemplate.expire(code, timeout, timeUnit);
     }
 
     @Override
-    public void saddCode(String code, Serializable sessionId, Integer timeout, TimeUnit timeUnit) {
+    public void saddCacheCode(String code, Serializable sessionId, Integer timeout, TimeUnit timeUnit) {
         redisTemplate.opsForSet().add(code, sessionId);
-        this.expireCode(code, timeout, timeUnit);
+        this.expireCacheCode(code, timeout, timeUnit);
     }
 
     @Override
-    public void scardCode(String code) {
+    public void scardCacheCode(String code) {
         log.info(String.format("当前code=%s，对应的注册系统个数：%s个",
                 code,
                 redisTemplate.opsForSet().size(code)
