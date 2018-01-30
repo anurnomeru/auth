@@ -2,8 +2,8 @@ package com.raythonsoft.sso.interceptor;
 
 import com.alibaba.fastjson.JSON;
 import com.raythonsoft.common.util.NetworkUtil;
-import com.raythonsoft.sso.model.SsoLog;
-import com.raythonsoft.sso.service.SsoLogService;
+import com.raythonsoft.sso.model.Log;
+import com.raythonsoft.sso.service.LogService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -34,7 +34,7 @@ public class LogAspect {
     // FIXME: 2018/1/27 待优化 ，看起来好像没有什么实际作用
 
     @Autowired
-    private SsoLogService ssoLogService;
+    private LogService logService;
 
     @Pointcut("execution(* *..controller..*.*(..))")
     public void log() {
@@ -44,19 +44,19 @@ public class LogAspect {
     public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
-        SsoLog ssoLog = SsoLog.builder()
-                .requestIp(NetworkUtil.getIpAddress(request))
-                .requestMethod(request.getMethod())
-                .requestTime(new Date())
-                .requestUri(request.getRequestURI())
+        Log ssoLog = Log.builder()
+                .ip(NetworkUtil.getIpAddress(request))
+                .method(request.getMethod())
+                .time(new Date())
+                .uri(request.getRequestURI())
                 .userAgent(request.getHeader("User-Agent"))
-                .userName(JSON.toJSONString(request.getUserPrincipal())).build();
+                .username(JSON.toJSONString(request.getUserPrincipal())).build();
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
 
         if (method.isAnnotationPresent(ApiOperation.class)) {
-            ssoLog.setMethodDescription(method.getAnnotation(ApiOperation.class).value());
+            ssoLog.setDescription(method.getAnnotation(ApiOperation.class).value());
         }
 
         if (method.isAnnotationPresent(RequiresPermissions.class)) {
@@ -74,16 +74,16 @@ public class LogAspect {
                     count++;
                 }
             }
-            ssoLog.setMethodPermissions(permissionsStr.toString());
+            ssoLog.setPermissions(permissionsStr.toString());
         }
 
         Map paramMap = request.getParameterMap();
         if (paramMap.size() == 0) {
-            ssoLog.setRequestParam(request.getQueryString());
+            ssoLog.setParam(request.getQueryString());
         } else {
-            ssoLog.setRequestParam(JSON.toJSONString(request.getParameterMap()));
+            ssoLog.setParam(JSON.toJSONString(request.getParameterMap()));
         }
-        ssoLogService.save(ssoLog);
+        logService.save(ssoLog);
         return joinPoint.proceed();
     }
 }

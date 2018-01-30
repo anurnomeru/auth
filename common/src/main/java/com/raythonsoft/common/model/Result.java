@@ -8,7 +8,6 @@ public class Result<T> {
     private int code;
     private String message;
     private T data;
-    private String status;
 
     public Result setCode(ResultCode resultCode) {
         this.code = resultCode.code;
@@ -39,15 +38,6 @@ public class Result<T> {
 
     public Result setData(T data) {
         this.data = data;
-        return this;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public Result setStatus(String status) {
-        this.status = status;
         return this;
     }
 }

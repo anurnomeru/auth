@@ -2,6 +2,8 @@ package com.raythonsoft.controller;
 
 import com.raythonsoft.common.constant.AuthConstant;
 import com.raythonsoft.common.model.Result;
+import com.raythonsoft.common.util.PropertiesFileUtil;
+import com.raythonsoft.common.util.ResultGenerator;
 import com.raythonsoft.sso.model.Project;
 import com.raythonsoft.sso.repository.CodeRedisRepository;
 import com.raythonsoft.sso.repository.SessionIdGenerator;
@@ -18,10 +20,9 @@ import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -76,6 +77,9 @@ public class SsoController {
         return "";/// FIXME: 2018/1/29 登陆界面
     }
 
+    @ApiOperation(value = "登陆")
+    @PostMapping("/login")
+    @ResponseBody
     public Result login(@RequestParam String username, @RequestParam String password, @RequestParam(required = false, defaultValue = "false") boolean rememberMe, String backUrl) {
         Subject subject = SecurityUtils.getSubject();
         Session session = subject.getSession();
@@ -103,9 +107,28 @@ public class SsoController {
             codeRedisRepository.setCheckCode(checkCode, (int) session.getTimeout() / 1000, TimeUnit.SECONDS);
         }
         if (!StringUtils.isEmpty(backUrl)) {
-            Project project = projectService.findby
+            Project project = projectService.findBy("name", PropertiesFileUtil.getInstance().get(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_NAME));
+            backUrl = (project == null ? "/" : project.getBasePath());
         }
+        return ResultGenerator.genSuccessResult(backUrl);
     }
 
+    @ApiOperation(value = "校验code")
+    @PostMapping(value = "/code")
+    @ResponseBody
+    public Result code(String checkCode) {
+        String checkCodeFromRedis = codeRedisRepository.getCheckCodeByGenningSessionId(sessionIdGenerator.genServerCode(checkCode));
+        if (StringUtils.isEmpty(checkCodeFromRedis) || !checkCodeFromRedis.equals(checkCode)) {
+            return ResultGenerator.genFailResult("CheckCode Validate Fail!");
+        }
+        return ResultGenerator.genSuccessResult(checkCodeFromRedis);
+    }
 
+    @ApiOperation(value = "退出登录")
+    @GetMapping(value = "/logout")
+    public String logout(HttpServletRequest request) {
+        SecurityUtils.getSubject().logout();
+        String redirectUrl = request.getHeader("Referer");
+        return "redirect:" + (redirectUrl == null ? "/" : redirectUrl);
+    }
 }

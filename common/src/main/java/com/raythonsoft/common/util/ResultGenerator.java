@@ -10,28 +10,24 @@ import com.raythonsoft.common.model.ResultCode;
 public class ResultGenerator {
     public static Result genSuccessResult() {
         return new Result()
-                .setCode(ResultCode.SUCCESS)
-                .setStatus("SUCCESS");
+                .setCode(ResultCode.SUCCESS);
     }
 
     public static Result genSuccessResult(Object data) {
         return new Result()
                 .setCode(ResultCode.SUCCESS)
-                .setData(data)
-                .setStatus("SUCCESS");
+                .setData(data);
     }
 
-    public static Result genFailResult(String message, String status) {
+    public static Result genFailResult(String message) {
         return new Result()
                 .setCode(ResultCode.FAIL)
-                .setMessage(message)
-                .setStatus(status);
+                .setMessage(message);
     }
 
     public static Result genExceptionResult(Exception e) {
         return new Result()
                 .setCode(ResultCode.FAIL)
-                .setMessage(e.getMessage())
-                .setStatus(e.getClass().getSimpleName());
+                .setMessage(e.getMessage());
     }
 }

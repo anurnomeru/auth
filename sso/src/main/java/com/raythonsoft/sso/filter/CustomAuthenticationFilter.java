@@ -49,15 +49,11 @@ public class CustomAuthenticationFilter extends AuthenticationFilter {
 
     private static CodeRedisRepository codeRedisRepository;
 
-
     @Autowired
     private SessionIdGenerator sessionIdGeneratorAutowired;
 
     @Autowired
     private CodeRedisRepository codeRedisRepositoryAutowired;
-
-    @Autowired
-    private SessionOperationRepository sessionOperationRepositoryAutowired;
 
     @Autowired
     private RestTemplate restTemplateAutowired;
@@ -127,7 +123,7 @@ public class CustomAuthenticationFilter extends AuthenticationFilter {
         ssoServerUrl.append(String.format(AuthConstant.URL_SSO_INDEX + "?appid=%s"
                 , PropertiesFileUtil
                         .getInstance(AuthConstant.SSO_PROPERTY.getPropertyFileName())
-                        .get(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_TYPE)));
+                        .get(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_APPID)));
 
         // 回跳地址
         HttpServletRequest httpServletRequest = WebUtils.toHttp(servletRequest);

@@ -13,6 +13,9 @@ public class Project {
 
     private String name;
 
+    @Column(name = "base_path")
+    private String basePath;
+
     @Transient
     private PageModel pageModel;
 }
