@@ -13,28 +13,15 @@ package com.raythonsoft.sso.exception;
  */
 public class ServiceException extends RuntimeException {
 
-    private String status;
-
-    public ServiceException(String status) {
-        this.status = status;
+    public ServiceException() {
     }
 
-    public ServiceException(String message, String status) {
+    public ServiceException(String message) {
         super(message);
-        this.status = status;
     }
 
-    public ServiceException(String message, Throwable cause, String status) {
+    public ServiceException(String message, Throwable cause) {
         super(message, cause);
-        this.status = status;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
 }

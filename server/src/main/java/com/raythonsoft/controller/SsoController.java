@@ -4,6 +4,7 @@ import com.raythonsoft.common.constant.AuthConstant;
 import com.raythonsoft.common.model.Result;
 import com.raythonsoft.common.util.PropertiesFileUtil;
 import com.raythonsoft.common.util.ResultGenerator;
+import com.raythonsoft.sso.exception.ServiceException;
 import com.raythonsoft.sso.model.Project;
 import com.raythonsoft.sso.repository.CodeRedisRepository;
 import com.raythonsoft.sso.repository.SessionIdGenerator;
@@ -23,6 +24,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -47,6 +50,15 @@ public class SsoController {
 
     @Autowired
     private ProjectService projectService;
+
+    @ApiOperation(value = "认证中心首页")
+    public String index(@RequestParam String appid, String backUrl) throws UnsupportedEncodingException {
+        Project project = projectService.findBy("appid", appid);
+        if (project == null) {
+            throw new ServiceException("Appid not exist");
+        }
+        return "redirect:/sso/login?backUrl=" + URLEncoder.encode(backUrl, "utf-8");
+    }
 
     @ApiOperation(value = "登陆")
     @GetMapping("/login")

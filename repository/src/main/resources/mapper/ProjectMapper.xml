@@ -7,6 +7,7 @@
     -->
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="appid" jdbcType="VARCHAR" property="appid" />
     <result column="base_path" jdbcType="VARCHAR" property="basePath" />
   </resultMap>
 </mapper>
