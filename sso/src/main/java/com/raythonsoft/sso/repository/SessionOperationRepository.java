@@ -61,7 +61,15 @@ public interface SessionOperationRepository {
     void deleteServerSessionId(String sessionId);
 
     /**
-     * 向 Redis 全局 session 列表左 push
+     * 将 sessionId 从全局session中移除
+     *
+     * @param sessionId
+     * @param count
+     */
+    void leftRemFromServerSessionIds(String sessionId, Integer count);
+
+    /**
+     * 将 sessionId 存入全局session中移除
      *
      * @param sessionId
      */

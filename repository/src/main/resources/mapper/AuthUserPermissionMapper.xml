@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.raythonsoft.sso.dao.AuthUserPermissionMapper">
+    <resultMap id="BaseResultMap" type="com.raythonsoft.sso.model.AuthUserPermission">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="user_permission_id" jdbcType="INTEGER" property="userPermissionId"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="permission_id" jdbcType="INTEGER" property="permissionId"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+    </resultMap>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT *
+        FROM auth_permission
+        WHERE permission_id IN (SELECT auth_role_permission.permission_id
+                                FROM auth_role_permission
+                                WHERE role_id IN (SELECT role_id
+                                                  FROM auth_user_role
+                                                  WHERE auth_user_role.user_id = #{userId}))
+        ORDER BY orders
+    </select>
+</mapper>

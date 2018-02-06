@@ -1,5 +1,6 @@
 package com.raythonsoft.sso;
 
+import com.raythonsoft.sso.util.MD5Util;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,7 +14,7 @@ public class SsoApplicationTests {
 
     @Test
     public void contextLoads() {
-
+        System.out.println(MD5Util.md5("authauth"));
     }
 
 }

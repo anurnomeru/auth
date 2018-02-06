@@ -4,6 +4,7 @@ import org.apache.ibatis.exceptions.TooManyResultsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import tk.mybatis.mapper.entity.Condition;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
@@ -65,7 +66,8 @@ public abstract class AbstractService<T> implements Service<T> {
     @Override
     public T findBy(String fieldName, Object value) throws TooManyResultsException {
         try {
-            T model = modelClass.newInstance();
+            Constructor<T> constructor = modelClass.getConstructor();
+            T model = constructor.newInstance();
             Field field = modelClass.getDeclaredField(fieldName);
             field.setAccessible(true);
             field.set(model, value);

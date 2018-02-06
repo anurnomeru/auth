@@ -2,8 +2,8 @@ package com.raythonsoft.sso.interceptor;
 
 import com.alibaba.fastjson.JSON;
 import com.raythonsoft.common.util.NetworkUtil;
-import com.raythonsoft.sso.model.Log;
-import com.raythonsoft.sso.service.LogService;
+import com.raythonsoft.sso.model.AuthLog;
+import com.raythonsoft.sso.service.AuthLogService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -34,7 +34,7 @@ public class LogAspect {
     // FIXME: 2018/1/27 待优化 ，看起来好像没有什么实际作用
 
     @Autowired
-    private LogService logService;
+    private AuthLogService authLogService;
 
     @Pointcut("execution(* *..controller..*.*(..))")
     public void log() {
@@ -44,19 +44,19 @@ public class LogAspect {
     public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
-        Log ssoLog = Log.builder()
+        AuthLog authLog = AuthLog.builder()
                 .ip(NetworkUtil.getIpAddress(request))
                 .method(request.getMethod())
-                .time(new Date())
+                .createTime(new Date())
                 .uri(request.getRequestURI())
-                .userAgent(request.getHeader("User-Agent"))
+                .userAgent(request.getHeader("AuthUser-Agent"))
                 .username(JSON.toJSONString(request.getUserPrincipal())).build();
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
 
         if (method.isAnnotationPresent(ApiOperation.class)) {
-            ssoLog.setDescription(method.getAnnotation(ApiOperation.class).value());
+            authLog.setDescription(method.getAnnotation(ApiOperation.class).value());
         }
 
         if (method.isAnnotationPresent(RequiresPermissions.class)) {
@@ -74,16 +74,16 @@ public class LogAspect {
                     count++;
                 }
             }
-            ssoLog.setPermissions(permissionsStr.toString());
+            authLog.setPermissions(permissionsStr.toString());
         }
 
         Map paramMap = request.getParameterMap();
         if (paramMap.size() == 0) {
-            ssoLog.setParam(request.getQueryString());
+            authLog.setParameter(request.getQueryString());
         } else {
-            ssoLog.setParam(JSON.toJSONString(request.getParameterMap()));
+            authLog.setParameter(JSON.toJSONString(request.getParameterMap()));
         }
-        logService.save(ssoLog);
+        authLogService.save(authLog);
         return joinPoint.proceed();
     }
 }

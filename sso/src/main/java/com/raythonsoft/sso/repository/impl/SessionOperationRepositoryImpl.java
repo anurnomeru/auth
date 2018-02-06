@@ -100,14 +100,8 @@ public class SessionOperationRepositoryImpl implements SessionOperationRepositor
         this.leftRemFromServerSessionIds(sessionId, 1);// leftRem 从全局会话中，删除这个sessionId
     }
 
-    /**
-     * 【 内部方法 不可直接将全局会话删除 】
-     * 将 sessionId 从 Redis 全局 session 列表左 rem
-     *
-     * @param sessionId
-     * @param count
-     */
-    private void leftRemFromServerSessionIds(String sessionId, Integer count) {
+    @Override
+    public void leftRemFromServerSessionIds(String sessionId, Integer count) {
         // leftRem 从全局会话中，删除这个sessionId
         redisTemplate.opsForList().remove(sessionIdGenerator.genServerSessionIds(), count, sessionId);
     }

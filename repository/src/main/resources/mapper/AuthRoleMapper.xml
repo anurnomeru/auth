@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.raythonsoft.sso.dao.AuthRoleMapper">
+    <resultMap id="BaseResultMap" type="com.raythonsoft.sso.model.AuthRole">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="role_id" jdbcType="INTEGER" property="roleId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="orders" jdbcType="INTEGER" property="orders"/>
+    </resultMap>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT *
+        FROM auth_role
+        WHERE role_id IN (SELECT role_id
+                          FROM auth_user_role
+                          WHERE user_id = #{userId})
+    </select>
+</mapper>

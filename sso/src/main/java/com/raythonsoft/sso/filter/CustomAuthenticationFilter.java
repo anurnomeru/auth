@@ -86,10 +86,10 @@ public class CustomAuthenticationFilter extends AuthenticationFilter {
         // 存入当前请求是客户端还是服务器端
         session.setAttribute(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_TYPE, ssoType);
 
-        if (SsoTypeEnum.CLIENT.name().equals(ssoType)) {
+        if (SsoTypeEnum.CLIENT.getName().equals(ssoType)) {
             return validateClient(request, response);
         }
-        if (SsoTypeEnum.SERVER.name().equals(ssoType)) {
+        if (SsoTypeEnum.SERVER.getName().equals(ssoType)) {
             return subject.isAuthenticated();
         }
         return false;
@@ -115,7 +115,7 @@ public class CustomAuthenticationFilter extends AuthenticationFilter {
                 .getInstance(AuthConstant.SSO_PROPERTY.getPropertyFileName())
                 .get(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_TYPE);
 
-        if (SsoTypeEnum.SERVER.name().equals(ssoType)) {
+        if (SsoTypeEnum.SERVER.getName().equals(ssoType)) {
             WebUtils.toHttp(servletResponse).sendRedirect(String.valueOf(ssoServerUrl.append(AuthConstant.URL_SSO_LOGIN)));
             return false;
         }

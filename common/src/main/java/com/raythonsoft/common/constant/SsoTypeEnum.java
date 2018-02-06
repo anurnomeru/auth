@@ -5,7 +5,7 @@ package com.raythonsoft.common.constant;
  * Description :
  */
 public enum SsoTypeEnum {
-    CLIENT("客户端", "0"), SERVER("服务端", "1");
+    CLIENT("client", "0"), SERVER("server", "1");
 
     private String name;
     private String index;

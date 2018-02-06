@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.raythonsoft.sso.dao.AuthSystemMapper">
+  <resultMap id="BaseResultMap" type="com.raythonsoft.sso.model.AuthSystem">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="system_id" jdbcType="INTEGER" property="systemId" />
+    <result column="icon" jdbcType="VARCHAR" property="icon" />
+    <result column="banner" jdbcType="VARCHAR" property="banner" />
+    <result column="base_path" jdbcType="VARCHAR" property="basePath" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="orders" jdbcType="INTEGER" property="orders" />
+  </resultMap>
+</mapper>

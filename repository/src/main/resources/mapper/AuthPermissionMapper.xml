@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.raythonsoft.sso.dao.AuthPermissionMapper">
+  <resultMap id="BaseResultMap" type="com.raythonsoft.sso.model.AuthPermission">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="permission_id" jdbcType="INTEGER" property="permissionId" />
+    <result column="system_id" jdbcType="INTEGER" property="systemId" />
+    <result column="parent_id" jdbcType="INTEGER" property="parentId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="permission_value" jdbcType="VARCHAR" property="permissionValue" />
+    <result column="uri" jdbcType="VARCHAR" property="uri" />
+    <result column="icon" jdbcType="VARCHAR" property="icon" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="orders" jdbcType="INTEGER" property="orders" />
+  </resultMap>
+</mapper>

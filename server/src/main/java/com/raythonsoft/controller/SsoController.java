@@ -4,8 +4,8 @@ import com.raythonsoft.common.constant.AuthConstant;
 import com.raythonsoft.common.model.Result;
 import com.raythonsoft.common.util.PropertiesFileUtil;
 import com.raythonsoft.common.util.ResultGenerator;
+import com.raythonsoft.common.util.StringUtils;
 import com.raythonsoft.sso.exception.ServiceException;
-import com.raythonsoft.sso.model.Project;
 import com.raythonsoft.sso.repository.CodeRedisRepository;
 import com.raythonsoft.sso.repository.SessionIdGenerator;
 import com.raythonsoft.sso.repository.SessionOperationRepository;
@@ -20,7 +20,6 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,10 +32,10 @@ import java.util.concurrent.TimeUnit;
  * Created by Anur IjuoKaruKas on 2018/1/29.
  * Description :
  */
-@Log4j
 @Controller
 @RequestMapping("/sso")
 @Api(value = "单点登录管理")
+@Log4j
 public class SsoController {
 
     @Autowired
@@ -71,7 +70,7 @@ public class SsoController {
         String checkCode = codeRedisRepository.getCheckCodeByGenningSessionId(sessionIdGenerator.genServerCode(serverSessionId));// 全局会话session
 
         // 如果全局会话session已经登陆
-        if (!StringUtils.isEmpty(checkCode)) {
+        if (StringUtils.isNotEmpty(checkCode)) {
             String ossUsername = (String) subject.getPrincipal();
             if (StringUtils.isEmpty(backUrl)) {
                 backUrl = "/";
@@ -99,7 +98,7 @@ public class SsoController {
 
         String ossCode = codeRedisRepository.getCheckCodeByGenningSessionId(sessionIdGenerator.genServerCode(serverSessionId));// 全局会话session
 
-        // 如果全局会话session已经登陆
+        // 如果还没有登陆
         if (StringUtils.isEmpty(ossCode)) {
             UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username, password);
             usernamePasswordToken.setRememberMe(rememberMe);
@@ -108,7 +107,7 @@ public class SsoController {
 
             // 更改状态为：在线
             sessionOperationRepository.updateShiroSessionStatus(serverSessionId, OnlineStatusEnum.ON_LINE);
-            // 维护全局会话的sessionId列表
+            // 将这个sessionId 存入全局会话
             sessionOperationRepository.leftPushIntoServerSessionId(serverSessionId);
 
             String checkCode = String.valueOf(UUID.randomUUID());
@@ -118,7 +117,7 @@ public class SsoController {
             // 初始化 code 的校验值
             codeRedisRepository.setCheckCode(checkCode, (int) session.getTimeout() / 1000, TimeUnit.SECONDS);
         }
-        if (!StringUtils.isEmpty(backUrl)) {
+        if (StringUtils.isEmpty(backUrl)) {
             Project project = projectService.findBy("name", PropertiesFileUtil.getInstance().get(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_NAME));
             backUrl = (project == null ? "/" : project.getBasePath());
         }

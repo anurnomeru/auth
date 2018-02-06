@@ -65,11 +65,11 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         exceptionResolvers.add((httpServletRequest, httpServletResponse, o, e) -> {
             Result result = new Result();
             if (e instanceof ServiceException) {//业务失败的异常，如“账号或密码错误”
-                result.setCode(ResultCode.FAIL).setMessage(e.getMessage()).setStatus(((ServiceException) e).getStatus());
+                result.setCode(ResultCode.FAIL).setMessage(e.getMessage());
                 logger.info(e.getMessage());
                 e.printStackTrace();
             } else if (e instanceof ValidationException) {//数据验证异常
-                result.setCode(ResultCode.FAIL).setStatus((e.getCause()).getMessage());
+                result.setCode(ResultCode.FAIL);
             } else if (e instanceof NoHandlerFoundException) {
                 result.setCode(ResultCode.NOT_FOUND).setMessage("接口 [" + httpServletRequest.getRequestURI() + "] 不存在");
             } else if (e instanceof ServletException) {

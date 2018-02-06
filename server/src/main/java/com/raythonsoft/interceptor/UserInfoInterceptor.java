@@ -1,8 +1,6 @@
 package com.raythonsoft.interceptor;
 
-import com.raythonsoft.sso.model.User;
 import com.raythonsoft.sso.service.UserService;
-import net.bytebuddy.asm.Advice;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +26,7 @@ public class UserInfoInterceptor extends HandlerInterceptorAdapter {
         if (request.getHeader(REQUEST_TYPE) == null || !REQUEST_AJAX.equals(request.getHeader(REQUEST_TYPE))) {
             Subject subject = SecurityUtils.getSubject();
             String username = (String) subject.getPrincipal();
-            User user = userService.findBy("username", username);
+            AuthUser user = userService.findBy("username", username);
             request.setAttribute("user", user);
         }
         return super.preHandle(request, response, handler);

@@ -90,11 +90,11 @@ public class SessionDao extends EnterpriseCacheSessionDAO {
         String sessionId = String.valueOf(session.getId());
         String ssoType = String.valueOf(session.getAttribute(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_TYPE));// 判断当前session是客户端还是服务器端
 
-        if (SsoTypeEnum.CLIENT.name().equals(ssoType)) {
+        if (SsoTypeEnum.CLIENT.getName().equals(ssoType)) {
             sessionOperationRepository.deleteClientSessionId(sessionId);
         }
 
-        if (SsoTypeEnum.SERVER.name().equals(ssoType)) {
+        if (SsoTypeEnum.SERVER.getName().equals(ssoType)) {
             sessionOperationRepository.deleteServerSessionId(sessionId);
         }
 
@@ -117,6 +117,7 @@ public class SessionDao extends EnterpriseCacheSessionDAO {
         List<Session> sessionList = new ArrayList<>();
         for (Object sessionId : sessionIdList) {
             Session session = sessionOperationRepository.getShiroSession((String) sessionId);
+            // 将过期的 session 移除
             if (null == session) {
                 sessionOperationRepository.leftRemFromServerSessionIds((String) sessionId, 1);
                 total = total - 1;
