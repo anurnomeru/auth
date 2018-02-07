@@ -13,7 +13,7 @@ public class AuthConstant {
         public static final String SSO_PROPERTY_TYPE = "sso.type";
         public static final String SSO_PROPERTY_SERVER_URL = "sso.server.url";
         public static final String SSO_PROPERTY_APPID = "sso.appid";
-        public static final String SSO_PROPERTY_NAME = "sso.app.name";
+        public static final String SSO_PROPERTY_NAME = "sso.app.name";// 这个看起来和上面的是一个东西
     }
 
     public static final String REQUEST_PARAM_CODE = "code";

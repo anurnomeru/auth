@@ -1,7 +1,9 @@
 package com.raythonsoft.sso.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import javax.persistence.*;
@@ -9,6 +11,8 @@ import javax.persistence.*;
 @Data
 @Builder
 @Table(name = "auth_permission")
+@NoArgsConstructor
+@AllArgsConstructor
 public class AuthPermission {
     @Id
     @Column(name = "permission_id")

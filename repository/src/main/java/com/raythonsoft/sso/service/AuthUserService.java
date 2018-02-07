@@ -1,4 +1,5 @@
 package com.raythonsoft.sso.service;
+
 import com.raythonsoft.sso.model.AuthUser;
 import com.raythonsoft.sso.core.Service;
 

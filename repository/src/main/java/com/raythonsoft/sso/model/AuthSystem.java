@@ -1,13 +1,17 @@
 package com.raythonsoft.sso.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import javax.persistence.*;
 @Data
 @Builder
 @Table(name = "auth_system")
+@NoArgsConstructor
+@AllArgsConstructor
 public class AuthSystem {
     @Id
     @Column(name = "system_id")
@@ -22,7 +26,7 @@ public class AuthSystem {
 
     private String status;
 
-    private String name;
+    private String appid;
 
     private String title;
 

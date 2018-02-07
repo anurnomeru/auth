@@ -6,10 +6,11 @@ import com.raythonsoft.common.util.PropertiesFileUtil;
 import com.raythonsoft.common.util.ResultGenerator;
 import com.raythonsoft.common.util.StringUtils;
 import com.raythonsoft.sso.exception.ServiceException;
+import com.raythonsoft.sso.model.AuthSystem;
 import com.raythonsoft.sso.repository.CodeRedisRepository;
 import com.raythonsoft.sso.repository.SessionIdGenerator;
 import com.raythonsoft.sso.repository.SessionOperationRepository;
-import com.raythonsoft.sso.service.ProjectService;
+import com.raythonsoft.sso.service.AuthSystemService;
 import com.raythonsoft.sso.session.OnlineStatusEnum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -48,12 +49,12 @@ public class SsoController {
     private SessionOperationRepository sessionOperationRepository;
 
     @Autowired
-    private ProjectService projectService;
+    private AuthSystemService authSystemService;
 
     @ApiOperation(value = "认证中心首页")
     public String index(@RequestParam String appid, String backUrl) throws UnsupportedEncodingException {
-        Project project = projectService.findBy("appid", appid);
-        if (project == null) {
+        AuthSystem authSystem = authSystemService.findBy("appid", appid);
+        if (authSystem == null) {
             throw new ServiceException("Appid not exist");
         }
         return "redirect:/sso/login?backUrl=" + URLEncoder.encode(backUrl, "utf-8");
@@ -118,8 +119,8 @@ public class SsoController {
             codeRedisRepository.setCheckCode(checkCode, (int) session.getTimeout() / 1000, TimeUnit.SECONDS);
         }
         if (StringUtils.isEmpty(backUrl)) {
-            Project project = projectService.findBy("name", PropertiesFileUtil.getInstance().get(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_NAME));
-            backUrl = (project == null ? "/" : project.getBasePath());
+            AuthSystem authSystem = authSystemService.findBy("appid", PropertiesFileUtil.getInstance(AuthConstant.SSO_PROPERTY.getPropertyFileName()).get(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_APPID));
+            backUrl = (authSystem == null ? "/" : authSystem.getBasePath());
         }
         return ResultGenerator.genSuccessResult(backUrl);
     }
