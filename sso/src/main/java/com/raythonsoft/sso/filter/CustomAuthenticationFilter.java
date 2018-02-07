@@ -13,7 +13,6 @@ import com.raythonsoft.common.util.PropertiesFileUtil;
 import com.raythonsoft.common.util.RequestParameterUtil;
 import com.raythonsoft.sso.repository.CodeRedisRepository;
 import com.raythonsoft.sso.repository.SessionIdGenerator;
-import com.raythonsoft.sso.repository.SessionOperationRepository;
 import lombok.extern.log4j.Log4j;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.Session;
@@ -24,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
@@ -41,6 +41,7 @@ import java.util.concurrent.TimeUnit;
  * Description : 认证 filter
  */
 @Log4j
+@Component
 public class CustomAuthenticationFilter extends AuthenticationFilter {
 
     private static RestTemplate restTemplate;
