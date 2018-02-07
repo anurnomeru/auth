@@ -6,7 +6,7 @@
     <groupId>com.raythonsoft</groupId>
     <artifactId>server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <name>server</name>
     <description>Demo project for Spring Boot</description>

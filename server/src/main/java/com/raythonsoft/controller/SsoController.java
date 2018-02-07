@@ -2,6 +2,7 @@ package com.raythonsoft.controller;
 
 import com.raythonsoft.common.constant.AuthConstant;
 import com.raythonsoft.common.model.Result;
+import com.raythonsoft.common.model.ResultCode;
 import com.raythonsoft.common.util.PropertiesFileUtil;
 import com.raythonsoft.common.util.ResultGenerator;
 import com.raythonsoft.common.util.StringUtils;
@@ -87,6 +88,16 @@ public class SsoController {
             return "redirect:" + backUrl;
         }
         return "";/// FIXME: 2018/1/29 登陆界面
+    }
+
+    @ApiOperation(value = "管理系统登陆")
+    @PostMapping("/server/login")
+    public String serverLogin(@RequestParam String username, @RequestParam String password, @RequestParam(required = false, defaultValue = "false") boolean rememberMe, String backUrl) {
+        Result result = this.login(username, password, rememberMe, backUrl);
+        if (result.getCode() == ResultCode.SUCCESS.code) {
+            return "redirect:../../index.html";
+        }
+        return "/";
     }
 
     @ApiOperation(value = "登陆")
