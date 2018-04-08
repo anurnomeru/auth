@@ -1,4 +1,4 @@
-package com.raythonsoft.server.client;
+package com.raythonsoft.client;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

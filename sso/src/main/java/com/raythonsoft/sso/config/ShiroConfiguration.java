@@ -22,17 +22,15 @@ import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.Lazy;
 
+import javax.servlet.Filter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Anur IjuoKaruKas on 2018/1/9.
@@ -40,9 +38,6 @@ import java.util.Map;
  */
 @Configuration
 public class ShiroConfiguration {
-
-//    @Autowired
-//    private ShiroProperties shiroProperties;
 
     /**
      * 自定义属性
@@ -65,12 +60,17 @@ public class ShiroConfiguration {
     public ShiroFilterFactoryBean shiroFilterFactoryBean(SecurityManager securityManager) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
-
-        shiroFilterFactoryBean.setFilterChainDefinitionMap(shiroProperties().getFilterChainDefinitionMap());
-
         shiroFilterFactoryBean.setLoginUrl(shiroProperties().getLoginUrl());
         shiroFilterFactoryBean.setSuccessUrl(shiroProperties().getLoginSuccessUrl());
         shiroFilterFactoryBean.setUnauthorizedUrl(shiroProperties().getUnauthorizedUrl());
+
+        // 配置认证过滤器
+        LinkedHashMap<String, Filter> filters = new LinkedHashMap<>();
+        filters.put("authc", authenticationFilter());
+        shiroFilterFactoryBean.setFilters(filters);
+
+        // 配置拦截规则
+        shiroFilterFactoryBean.setFilterChainDefinitionMap(shiroProperties().getFilterChainDefinitionMap());
         return shiroFilterFactoryBean;
     }
 
