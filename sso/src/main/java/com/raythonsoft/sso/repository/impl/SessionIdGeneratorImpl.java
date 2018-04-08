@@ -46,7 +46,7 @@ public class SessionIdGeneratorImpl implements SessionIdGenerator {
     }
 
     @Override
-    public String genServerCode(String code) {
-        return String.format(SsoConstant.ID_FORM, shiroProperties.getAuthServerCode(), code);
+    public String genCheckCode(String code) {
+        return String.format(SsoConstant.ID_FORM, shiroProperties.getAuthCheckCode(), code);
     }
 }

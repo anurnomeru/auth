@@ -21,7 +21,7 @@ public class ShiroProperties {
 
     private String authServerSessionIds;// 在code下注册全局会话 <List>
 
-    private String authServerCode;// server code校验值 <Set>
+    private String authCheckCode;// check code校验值 <Set>
 
     private String unauthorizedUrl;// 无权限跳转
 

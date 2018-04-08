@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  * Created by Anur IjuoKaruKas on 2018/1/26.
- * Description :
+ * Description : 可装配各种SessionId的RedisKey
  */
 public interface SessionIdGenerator {
 
@@ -53,5 +53,5 @@ public interface SessionIdGenerator {
      * @param code
      * @return
      */
-    String genServerCode(String code);
+    String genCheckCode(String code);
 }

@@ -107,7 +107,7 @@ public class SessionOperationRepositoryImpl implements SessionOperationRepositor
     }
 
     @Override
-    public void leftPushIntoServerSessionId(Serializable sessionId) {
+    public void leftPushIntoServerSessionIds(Serializable sessionId) {
         redisTemplate.opsForList().leftPush(sessionIdGenerator.genServerSessionIds(), sessionId);
     }
 

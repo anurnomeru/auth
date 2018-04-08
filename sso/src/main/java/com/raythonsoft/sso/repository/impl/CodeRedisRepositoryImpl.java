@@ -36,12 +36,12 @@ public class CodeRedisRepositoryImpl implements CodeRedisRepository {
 
     @Override
     public void setCheckCode(String checkCode, Integer timeout, TimeUnit timeUnit) {
-        redisTemplate.opsForValue().set(sessionIdGenerator.genServerCode(checkCode), checkCode, timeout, timeUnit);
+        redisTemplate.opsForValue().set(sessionIdGenerator.genCheckCode(checkCode), checkCode, timeout, timeUnit);
     }
 
     @Override
     public void removeCheckCode(String checkCode) {
-        redisTemplate.delete(sessionIdGenerator.genServerCode(checkCode));
+        redisTemplate.delete(sessionIdGenerator.genCheckCode(checkCode));
     }
 
     @Override

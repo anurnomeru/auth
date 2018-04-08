@@ -73,7 +73,7 @@ public interface SessionOperationRepository {
      *
      * @param sessionId
      */
-    void leftPushIntoServerSessionId(Serializable sessionId);
+    void leftPushIntoServerSessionIds(Serializable sessionId);
 
     /**
      * 获取当前的总服务器数

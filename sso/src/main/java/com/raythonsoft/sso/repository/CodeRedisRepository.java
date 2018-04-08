@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Anur IjuoKaruKas on 2018/1/26.
  * Description :
- * CheckCode ： 原始code
+ * CheckCode ： 原始code String checkCode = String.valueOf(UUID.randomUUID());
  * CacheCode ： 维护会话列表的code（由checkCode加上标识）
  */
 public interface CodeRedisRepository {
@@ -22,8 +22,8 @@ public interface CodeRedisRepository {
     /**
      * 创建会话，将checkCode保存在sessionId下
      *
-     * @param genningSessionId
-     * @param checkCode
+     * @param genningSessionId key
+     * @param checkCode        value
      * @param timeout
      * @param timeUnit
      */
@@ -31,6 +31,7 @@ public interface CodeRedisRepository {
 
     /**
      * 初始化checkCode
+     * redisTemplate.opsForValue().set(sessionIdGenerator.genCheckCode(checkCode), checkCode, timeout, timeUnit);
      *
      * @param checkCode
      * @param timeout
