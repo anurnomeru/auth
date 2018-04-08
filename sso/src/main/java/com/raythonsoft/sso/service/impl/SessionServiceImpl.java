@@ -40,7 +40,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public void sessionEffective(Session session) {
+    public String sessionEffective(Session session) {
         String serverSessionId = String.valueOf(session.getId());
 
         // 更改状态为：在线
@@ -59,5 +59,7 @@ public class SessionServiceImpl implements SessionService {
 
         // 初始化 code 的校验值
         codeRedisRepository.setCheckCode(checkCode, (int) session.getTimeout() / 1000, TimeUnit.SECONDS);
+
+        return checkCode;
     }
 }

@@ -1,6 +1,6 @@
 package com.raythonsoft;
 
-import com.raythonsoft.sso.SsoApplication;
+import com.raythonsoft.server.ServerApplication;
 import com.raythonsoft.sso.util.MD5Util;
 import lombok.extern.log4j.Log4j;
 import org.junit.Test;

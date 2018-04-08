@@ -1,4 +1,4 @@
-package com.raythonsoft.interceptor;
+package com.raythonsoft.server.interceptor;
 
 import com.raythonsoft.sso.model.AuthUser;
 import com.raythonsoft.sso.service.AuthUserService;

@@ -1,5 +1,6 @@
-package com.raythonsoft.controller;
+package com.raythonsoft.server.controller;
 
+import com.raythonsoft.common.util.StringUtils;
 import com.raythonsoft.sso.service.SessionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -47,6 +48,7 @@ public class SsoController {
         Subject subject = SecurityUtils.getSubject();
         Session session = subject.getSession();
 
+        String checkCode = "";
         if (!sessionService.isEffective(session)) {// 如果无效
             // 则进行登陆
             UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username, password);
@@ -60,9 +62,14 @@ public class SsoController {
             }
 
             // 将session有效化
-            sessionService.sessionEffective(session);
+            checkCode = sessionService.sessionEffective(session);
         }
 
-        return "redirect:/home";
+        if (StringUtils.isEmpty(redirectUrl)) {
+            return "redirect:/home";
+        } else {
+            String result = String.format("redirect:%s?checkCode=%s", redirectUrl, checkCode);
+            return result;
+        }
     }
 }

@@ -3,6 +3,8 @@ package com.raythonsoft.sso.properties;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.Map;
+
 /**
  * Created by Anur IjuoKaruKas on 2018/1/10.
  * Description :
@@ -34,4 +36,6 @@ public class ShiroProperties {
     private Integer rememberMeTimeout;// 记住我超时时间
 
     private String rememberMeCipherKey;// 记住我加密密钥
+
+    private Map<String, String> filterChainDefinitionMap;// 拦截策略
 }

@@ -1,4 +1,4 @@
-package com.raythonsoft.controller;
+package com.raythonsoft.server.controller;
 
 import com.raythonsoft.common.constant.AuthConstant;
 import com.raythonsoft.common.model.Result;

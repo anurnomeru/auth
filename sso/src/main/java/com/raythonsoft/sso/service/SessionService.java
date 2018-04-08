@@ -11,6 +11,7 @@ public interface SessionService {
 
     /**
      * 判断session是否有效（redis是否过期）
+     * 从Server_session_id + sessionId判断
      *
      * @param session
      * @return
@@ -28,6 +29,7 @@ public interface SessionService {
      * <p>
      *
      * @param session
+     * @return checkCode
      */
-    void sessionEffective(Session session);
+    String sessionEffective(Session session);
 }

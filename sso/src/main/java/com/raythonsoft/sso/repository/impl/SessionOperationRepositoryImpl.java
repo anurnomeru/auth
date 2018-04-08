@@ -106,6 +106,7 @@ public class SessionOperationRepositoryImpl implements SessionOperationRepositor
         redisTemplate.opsForList().remove(sessionIdGenerator.genServerSessionIds(), count, sessionId);
     }
 
+    // FIXME: 2018/4/8 sessionId过期会导致重复push
     @Override
     public void leftPushIntoServerSessionIds(Serializable sessionId) {
         redisTemplate.opsForList().leftPush(sessionIdGenerator.genServerSessionIds(), sessionId);
