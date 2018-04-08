@@ -9,6 +9,7 @@ import com.raythonsoft.sso.service.SessionService;
 import com.raythonsoft.sso.session.OnlineStatusEnum;
 import org.apache.shiro.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -17,16 +18,13 @@ import java.util.concurrent.TimeUnit;
  * Created by Anur IjuoKaruKas on 2018/4/8.
  * Description :
  */
+@Service
 public class SessionServiceImpl implements SessionService {
 
     private final CodeRedisRepository codeRedisRepository;
-
     private final SessionIdGenerator sessionIdGenerator;
-
     private final SessionOperationRepository sessionOperationRepository;
-
     private final AuthSystemService authSystemService;
-
 
     @Autowired
     public SessionServiceImpl(CodeRedisRepository codeRedisRepository, SessionIdGenerator sessionIdGenerator, SessionOperationRepository sessionOperationRepository, AuthSystemService authSystemService) {

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
  * Created by Anur IjuoKaruKas on 2018/4/8.
  * Description :
  */
-@Service
 public interface SessionService {
 
     /**
