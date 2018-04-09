@@ -52,10 +52,13 @@ public class CustomAuthenticationFilter extends FormAuthenticationFilter {
                 return true;
             }
         } else {
+            log.info("用户没有登陆，需要进行认证。");
             this.saveRequest(request);
             if (ssoProperties.getType().equals(SsoTypeEnum.SERVER.getName())) {
+                log.info("用户正访问验证中心。");
                 WebUtils.issueRedirect(request, response, ssoProperties.getServerUrl());
             } else {
+                log.info("用户正访问客户端。");
                 return validateClient(request, response);
             }
             return false;
@@ -65,18 +68,26 @@ public class CustomAuthenticationFilter extends FormAuthenticationFilter {
 
     private boolean validateClient(ServletRequest request, ServletResponse response) throws Exception {
         String checkCode = request.getParameter("checkCode");
-        if (checkCode != null) {
-            System.out.println(checkCode);
-            if (validateCode(checkCode)) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        // 没登陆的情况下，将请求转发到认证中心
+        String userName = request.getParameter("username");
         if (request instanceof HttpServletRequest) {
             HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+
+            if (checkCode != null) {
+                log.info("有code参数，可进行登陆");
+                if (validateCode(checkCode)) {
+                    log.info("认证成功，进行无密登陆");
+                    getSubject(request, response).login(new UsernamePasswordToken(userName, ""));
+                    WebUtils.issueRedirect(request, response, UrlUtil.getUrlWithOutCodeAndName(httpServletRequest));
+                    return true;
+                } else {
+                    log.info("认证失败");
+                    WebUtils.issueRedirect(request, response, String.format("%s?backUrl=%s", ssoProperties.getServerUrl(), UrlUtil.getEncodeUrlWithParam(httpServletRequest)));
+                    return false;
+                }
+            }
+
+            // 没登陆的情况下，将请求转发到认证中心
+            log.info("用户未拥有code参数，需访问验证中心");
             WebUtils.issueRedirect(request, response, String.format("%s?backUrl=%s", ssoProperties.getServerUrl(), UrlUtil.getEncodeUrlWithParam(httpServletRequest)));
         }
         return false;
@@ -99,7 +110,6 @@ public class CustomAuthenticationFilter extends FormAuthenticationFilter {
                 });
 
         if (result.getCode() == ResultCode.SUCCESS.code && checkCode.equals(result.getData())) {// 如果code校验成功
-            System.out.println("校验成功");
             return true;
         }
 

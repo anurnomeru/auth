@@ -8,6 +8,7 @@ import com.raythonsoft.common.util.PropertiesFileUtil;
 import com.raythonsoft.sso.model.AuthPermission;
 import com.raythonsoft.sso.model.AuthRole;
 import com.raythonsoft.sso.model.AuthUser;
+import com.raythonsoft.sso.properties.SsoProperties;
 import com.raythonsoft.sso.service.AuthPermissionService;
 import com.raythonsoft.sso.service.AuthRoleService;
 import com.raythonsoft.sso.service.AuthUserService;
@@ -38,6 +39,9 @@ public class CustomRealm extends AuthorizingRealm {
     @Autowired
     private AuthRoleService authRoleService;
 
+    @Autowired
+    private SsoProperties ssoProperties;
+
     /**
      * 认证：登陆
      *
@@ -51,7 +55,7 @@ public class CustomRealm extends AuthorizingRealm {
         String password = new String((char[]) authenticationToken.getCredentials());
 
         // 无密认证
-        String ssoType = PropertiesFileUtil.getInstance(AuthConstant.SSO_PROPERTY.getPropertyFileName()).get(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_TYPE);
+        String ssoType = ssoProperties.getType();
         if (ssoType.equals(SsoTypeEnum.CLIENT.getName())) {
             return new SimpleAuthenticationInfo(
                     username,

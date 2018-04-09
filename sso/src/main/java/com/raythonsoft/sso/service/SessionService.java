@@ -26,6 +26,8 @@ public interface SessionService {
      */
     String getCheckCodeByGenCheckCode(String checkCode);
 
+    String getCheckCodeBySessionId(String serverSessionId);
+
     /**
      * 维护shiroSession，在这里，将进行下列操作：
      * <!-- shiroSession在会话创建时就已经创建 >

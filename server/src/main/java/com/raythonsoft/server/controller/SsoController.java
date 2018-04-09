@@ -49,7 +49,6 @@ public class SsoController {
         // 首先获取出当前请求的sessionId
         Subject subject = SecurityUtils.getSubject();
         Session session = subject.getSession();
-
         log.info("==> ServerSessionId: {}" + session.getId());
 
         String checkCode = "";
@@ -69,14 +68,15 @@ public class SsoController {
             checkCode = sessionService.sessionEffective(session);
         }
 
+        session.setAttribute("username", username);
+
         String backUrl = String.valueOf(session.getAttribute(SsoConstant.BACK_URL));
         session.removeAttribute(SsoConstant.BACK_URL);
 
         if (StringUtils.isEmpty(backUrl)) {
             return "redirect:/home";
         } else {
-            String url = String.format("redirect:%s", UrlUtil.addParam(backUrl, "checkCode", checkCode));
-            System.out.println(url);
+            String url = String.format("redirect:%s", UrlUtil.addParam(UrlUtil.addParam(backUrl, "checkCode", checkCode), "username", username));
             return url;
         }
     }

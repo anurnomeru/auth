@@ -45,6 +45,11 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
+    public String getCheckCodeBySessionId(String serverSessionId) {
+        return codeRedisRepository.getCheckCodeByGenningSessionId(sessionIdGenerator.genServerSessionId(serverSessionId));
+    }
+
+    @Override
     public String sessionEffective(Session session) {
         String serverSessionId = String.valueOf(session.getId());
 

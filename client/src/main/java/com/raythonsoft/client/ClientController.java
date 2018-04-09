@@ -12,7 +12,6 @@ public class ClientController {
 
     @GetMapping("client")
     public String test() {
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         return "client";
     }
 }

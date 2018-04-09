@@ -31,10 +31,14 @@ public class PageController {
         if (StringUtils.isNotEmpty(backUrl)) {
             if (subject.isAuthenticated()) {
                 // 已经登陆，则直接带着code 回跳
-//                return String.format("redirect:%s", UrlUtil.addParam(backUrl, "checkCode", sessionService.getCheckCodeByGenCheckCode(session)));
+                return String.format("redirect:%s", UrlUtil.addParam(backUrl, "checkCode", sessionService.getCheckCodeBySessionId(String.valueOf(session.getId()))));
             } else {
                 // 没有登陆，则去登陆
                 subject.getSession().setAttribute(SsoConstant.BACK_URL, backUrl);
+            }
+        } else {
+            if (subject.isAuthenticated()) {
+                return "redirect:/home";
             }
         }
         return "redirect:/login";
