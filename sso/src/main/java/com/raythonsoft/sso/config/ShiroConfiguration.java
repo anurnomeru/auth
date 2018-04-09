@@ -1,6 +1,7 @@
 package com.raythonsoft.sso.config;
 
 import com.raythonsoft.sso.filter.CustomAuthenticationFilter;
+import com.raythonsoft.sso.filter.CustomAuthorizationFilter;
 import com.raythonsoft.sso.filter.ForceLogoutFilter;
 import com.raythonsoft.sso.listener.CustomSessionListener;
 import com.raythonsoft.sso.properties.ShiroProperties;
@@ -18,6 +19,7 @@ import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSource
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.filter.AccessControlFilter;
 import org.apache.shiro.web.filter.authc.AuthenticationFilter;
+import org.apache.shiro.web.filter.authz.AuthorizationFilter;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
@@ -38,6 +40,8 @@ import java.util.List;
  */
 @Configuration
 public class ShiroConfiguration {
+
+    private final String loginUrl = "/login";
 
     /**
      * 自定义属性
@@ -60,7 +64,7 @@ public class ShiroConfiguration {
     public ShiroFilterFactoryBean shiroFilterFactoryBean(SecurityManager securityManager) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
-        shiroFilterFactoryBean.setLoginUrl(shiroProperties().getLoginUrl());
+        shiroFilterFactoryBean.setLoginUrl("/");
         shiroFilterFactoryBean.setSuccessUrl(shiroProperties().getLoginSuccessUrl());
         shiroFilterFactoryBean.setUnauthorizedUrl(shiroProperties().getUnauthorizedUrl());
 
@@ -75,13 +79,23 @@ public class ShiroConfiguration {
     }
 
     /**
-     * Authentication 过滤器
+     * Authentication 过滤器（暂时没用）
      *
      * @return
      */
     @Bean
     public AuthenticationFilter authenticationFilter() {
         return new CustomAuthenticationFilter();
+    }
+
+    /**
+     * AuthorizationFilter 过滤器（暂时没用）
+     *
+     * @return
+     */
+    @Bean
+    public AuthorizationFilter authorizationFilter() {
+        return new CustomAuthorizationFilter();
     }
 
     /**

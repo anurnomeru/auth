@@ -21,7 +21,7 @@ public class AuthConstant {
     public static final String REQUEST_PARAM_OSS_USERNAME = "username";
 
     public static final String URL_SSO_CODE = "/sso/code";
-    public static final String URL_SSO_LOGIN = "/sso/login";
+    public static final String URL_SSO_LOGIN = "/";
     public static final String URL_SSO_INDEX = "/sso/index";
 
 }

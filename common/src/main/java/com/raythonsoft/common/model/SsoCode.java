@@ -10,5 +10,13 @@ import lombok.Data;
 @Data
 @Builder
 public class SsoCode {
+
+    public SsoCode() {
+    }
+
+    public SsoCode(String checkCode) {
+        this.checkCode = checkCode;
+    }
+
     private String checkCode;
 }

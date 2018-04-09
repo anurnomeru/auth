@@ -83,7 +83,7 @@ public class LogAspect {
         } else {
             authLog.setParameter(JSON.toJSONString(request.getParameterMap()));
         }
-        authLogService.save(authLog);
+//        authLogService.save(authLog);
         return joinPoint.proceed();
     }
 }

@@ -29,8 +29,6 @@ public class ShiroProperties {
 
     private String loginSuccessUrl;// 登陆成功跳转
 
-    private String loginUrl;// 登录页
-
     private Integer sessionTimeout;// 超时时间
 
     private Integer rememberMeTimeout;// 记住我超时时间

@@ -3,21 +3,18 @@ package com.raythonsoft.sso.filter;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.github.pagehelper.util.StringUtil;
 import com.raythonsoft.common.constant.AuthConstant;
 import com.raythonsoft.common.constant.SsoTypeEnum;
 import com.raythonsoft.common.model.Result;
 import com.raythonsoft.common.model.ResultCode;
 import com.raythonsoft.common.model.SsoCode;
 import com.raythonsoft.common.util.PropertiesFileUtil;
-import com.raythonsoft.common.util.RequestParameterUtil;
-import com.raythonsoft.sso.repository.CodeRedisRepository;
-import com.raythonsoft.sso.repository.SessionIdGenerator;
+import com.raythonsoft.sso.properties.SsoProperties;
+import com.raythonsoft.sso.util.UrlUtil;
 import lombok.extern.log4j.Log4j;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.session.Session;
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.web.filter.authc.AuthenticationFilter;
+import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -26,14 +23,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -42,193 +35,74 @@ import java.util.concurrent.TimeUnit;
  */
 @Log4j
 @Component
-public class CustomAuthenticationFilter extends AuthenticationFilter {
-
-    private static RestTemplate restTemplate;
-
-    private static SessionIdGenerator sessionIdGenerator;
-
-    private static CodeRedisRepository codeRedisRepository;
+public class CustomAuthenticationFilter extends FormAuthenticationFilter {
 
     @Autowired
-    private SessionIdGenerator sessionIdGeneratorAutowired;
+    private SsoProperties ssoProperties;
 
     @Autowired
-    private CodeRedisRepository codeRedisRepositoryAutowired;
+    private RestTemplate restTemplate;
 
-    @Autowired
-    private RestTemplate restTemplateAutowired;
-
-    @PostConstruct
-    public void beforeInit() {
-        sessionIdGenerator = sessionIdGeneratorAutowired;
-        codeRedisRepository = codeRedisRepositoryAutowired;
-        restTemplate = restTemplateAutowired;
-    }
-
-    /**
-     * 是否通过认证
-     *
-     * @param request
-     * @param response
-     * @param mappedValue
-     * @return
-     */
     @Override
-    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
-        Subject subject = getSubject(request, response);
-        Session session = subject.getSession();
-
-        // 判断请求类型
-        String ssoType = PropertiesFileUtil
-                .getInstance(AuthConstant.SSO_PROPERTY.getPropertyFileName())
-                .get(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_TYPE);
-
-        // 存入当前请求是客户端还是服务器端
-        session.setAttribute(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_TYPE, ssoType);
-
-        if (SsoTypeEnum.CLIENT.getName().equals(ssoType)) {
-            return validateClient(request, response);
-        }
-        if (SsoTypeEnum.SERVER.getName().equals(ssoType)) {
-            return subject.isAuthenticated();
-        }
-        return false;
-    }
-
-    /**
-     * 认证通过后，做什么
-     *
-     * @param servletRequest
-     * @param servletResponse
-     * @return
-     * @throws Exception
-     */
-    @Override
-    protected boolean onAccessDenied(ServletRequest servletRequest, ServletResponse servletResponse) throws Exception {
-        // 获取回调地址
-        StringBuilder ssoServerUrl = PropertiesFileUtil
-                .getInstance(AuthConstant.SSO_PROPERTY.getPropertyFileName())
-                .get(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_SERVER_URL);
-
-        // 判断请求类型
-        String ssoType = PropertiesFileUtil
-                .getInstance(AuthConstant.SSO_PROPERTY.getPropertyFileName())
-                .get(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_TYPE);
-
-        if (SsoTypeEnum.SERVER.getName().equals(ssoType)) {
-            WebUtils.toHttp(servletResponse).sendRedirect(String.valueOf(ssoServerUrl.append(AuthConstant.URL_SSO_LOGIN)));
-            return false;
-        }
-
-        ssoServerUrl.append(String.format(AuthConstant.URL_SSO_INDEX + "?appid=%s"
-                , PropertiesFileUtil
-                        .getInstance(AuthConstant.SSO_PROPERTY.getPropertyFileName())
-                        .get(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_APPID)));
-
-        // 回跳地址
-        HttpServletRequest httpServletRequest = WebUtils.toHttp(servletRequest);
-
-        StringBuffer backUrl = httpServletRequest.getRequestURL();// 当前url
-        String queryString = httpServletRequest.getQueryString();// 加参数
-        if (StringUtil.isNotEmpty(queryString)) {
-            backUrl.append("?").append(queryString);
-        }
-        ssoServerUrl.append("&backUrl=").append(URLEncoder.encode(backUrl.toString(), "utf-8"));
-        WebUtils.toHttp(servletResponse).sendRedirect(ssoServerUrl.toString());// 两个参数，一个appid 一个backUrl
-        return false;
-    }
-
-    /**
-     * 客户端验证
-     *
-     * @param request
-     * @param response
-     * @return
-     */
-    private boolean validateClient(ServletRequest request, ServletResponse response) {
-        Subject subject = getSubject(request, response);
-        Session session = subject.getSession();
-        String sessionId = String.valueOf(session.getId());
-        int timeOut = (int) session.getTimeout() / 1000;
-
-        // 判断局部会话是否已经登陆
-        String checkCodeFromRedis = codeRedisRepository.getCheckCodeByGenningSessionId(sessionIdGenerator.genShiroSessionId(sessionId));
-        if (checkCodeFromRedis != null) {// 如果已经登陆过
-            // 更新session有效期
-            codeRedisRepository.setCheckCodeIntoGenningSessionId(// 更新该session在局部会话的有效期
-                    sessionIdGenerator.genClientSessionId(sessionId),
-                    checkCodeFromRedis,
-                    timeOut,
-                    TimeUnit.SECONDS);
-
-            codeRedisRepository.expireCacheCode(// 更新该session所属 code下局部会话 Set 的有效期
-                    sessionIdGenerator.genClientSessionIdsCodeParamCode(checkCodeFromRedis),
-                    timeOut,
-                    TimeUnit.SECONDS);
-
-            if (null != request.getParameter(AuthConstant.REQUEST_PARAM_CODE)) {
-                String backUrl = RequestParameterUtil.getUrlWithOutCodeAndName(WebUtils.toHttp(request));// 移除sso_code和sso_username //fixme webUtils是个好东西
-                HttpServletResponse httpServletResponse = WebUtils.toHttp(response);
-                try {
-                    httpServletResponse.sendRedirect(backUrl);
-                } catch (IOException e) {
-                    log.error("Login success, bug redirect ERROR: ", e);
-                }
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
+        if (this.isLoginRequest(request, response)) {
+            if (this.isLoginSubmission(request, response)) {
+                return this.executeLogin(request, response);
             } else {
                 return true;
             }
-        }
-
-        // 判断认证中心是否有sso_code
-        String checkCodeFromRequest = request.getParameter(AuthConstant.REQUEST_PARAM_OSS_CODE);
-        if (StringUtil.isNotEmpty(checkCodeFromRequest)) {// 如果没有登陆过，但是请求带了sso_code
-            // 获取回调地址
-            String ssoServerUrl = PropertiesFileUtil
-                    .getInstance(AuthConstant.SSO_PROPERTY.getPropertyFileName())
-                    .get(AuthConstant.SSO_PROPERTY.SSO_PROPERTY_SERVER_URL);
-
-            // 校验code
-            HttpEntity<SsoCode> restTemplateRequestEntity = new HttpEntity<>(SsoCode.builder().checkCode(checkCodeFromRequest).build(), null);
-            ResponseEntity<JSONObject> restTemplateResponse = restTemplate.exchange(ssoServerUrl + AuthConstant.URL_SSO_CODE,
-                    HttpMethod.POST,
-                    restTemplateRequestEntity,
-                    JSONObject.class);
-
-            String restTemplateResponseJsonStr = restTemplateResponse.getBody().toJSONString();
-            Result<String> result = JSON.parseObject(restTemplateResponseJsonStr,
-                    new TypeReference<Result<String>>() {
-                    });
-
-            if (result.getCode() == ResultCode.SUCCESS.code && checkCodeFromRequest.equals(result.getData())) {// 如果code校验成功
-                codeRedisRepository.setCheckCodeIntoGenningSessionId(// 创建局部会话
-                        sessionIdGenerator.genClientSessionId(sessionId),
-                        checkCodeFromRequest,
-                        timeOut,
-                        TimeUnit.SECONDS
-                );
-                codeRedisRepository.saddCacheCode(// 将sessionId保存到该code下的局部会话 Set 中
-                        sessionIdGenerator.genClientSessionIdsCodeParamCode(checkCodeFromRequest),
-                        sessionId,
-                        timeOut,
-                        TimeUnit.SECONDS);
-
-                codeRedisRepository.scardCacheCode(sessionIdGenerator.genClientSessionIdsCodeParamCode(checkCodeFromRequest));// 打印 code 下注册的系统
-
-                String ssoUsername = request.getParameter(AuthConstant.REQUEST_PARAM_OSS_USERNAME);
-                String backUrl = RequestParameterUtil.getUrlWithOutCodeAndName(WebUtils.toHttp(request));// 移除sso_code和sso_username
-                try {
-                    // 无密认证
-                    subject.login(new UsernamePasswordToken(ssoUsername, ""));
-                    WebUtils.toHttp(response).sendRedirect(backUrl);
-                    return true;
-                } catch (IOException e) {
-                    log.error("Resolve ssoCode success, bug redirect ERROR: ", e);
-                }
+        } else {
+            this.saveRequest(request);
+            if (ssoProperties.getType().equals(SsoTypeEnum.SERVER.getName())) {
+                WebUtils.issueRedirect(request, response, ssoProperties.getServerUrl());
             } else {
-                log.warn("Resolve ssoCode fail: " + result.getData());
+                return validateClient(request, response);
+            }
+            return false;
+        }
+    }
+
+
+    private boolean validateClient(ServletRequest request, ServletResponse response) throws Exception {
+        String checkCode = request.getParameter("checkCode");
+        if (checkCode != null) {
+            System.out.println(checkCode);
+            if (validateCode(checkCode)) {
+                return true;
+            } else {
+                return false;
             }
         }
+
+        // 没登陆的情况下，将请求转发到认证中心
+        if (request instanceof HttpServletRequest) {
+            HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+            WebUtils.issueRedirect(request, response, String.format("%s?backUrl=%s", ssoProperties.getServerUrl(), UrlUtil.getEncodeUrlWithParam(httpServletRequest)));
+        }
+        return false;
+    }
+
+    private boolean validateCode(String checkCode) {
+        // 获取回调地址
+        String ssoServerUrl = ssoProperties.getServerUrl();
+
+        // 校验code
+        HttpEntity<SsoCode> restTemplateRequestEntity = new HttpEntity<>(SsoCode.builder().checkCode(checkCode).build(), null);
+        ResponseEntity<JSONObject> restTemplateResponse = restTemplate.exchange(ssoServerUrl + AuthConstant.URL_SSO_CODE,
+                HttpMethod.POST,
+                restTemplateRequestEntity,
+                JSONObject.class);
+
+        String restTemplateResponseJsonStr = restTemplateResponse.getBody().toJSONString();
+        Result<String> result = JSON.parseObject(restTemplateResponseJsonStr,
+                new TypeReference<Result<String>>() {
+                });
+
+        if (result.getCode() == ResultCode.SUCCESS.code && checkCode.equals(result.getData())) {// 如果code校验成功
+            System.out.println("校验成功");
+            return true;
+        }
+
         return false;
     }
 }

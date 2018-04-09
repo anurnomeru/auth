@@ -19,6 +19,14 @@ public interface SessionService {
     boolean isEffective(Session session);
 
     /**
+     * 获取CheckCode
+     *
+     * @param checkCode
+     * @return
+     */
+    String getCheckCodeByGenCheckCode(String checkCode);
+
+    /**
      * 维护shiroSession，在这里，将进行下列操作：
      * <!-- shiroSession在会话创建时就已经创建 >
      * <p>
