@@ -42,6 +42,10 @@ public class CustomRealm extends AuthorizingRealm {
     @Autowired
     private SsoProperties ssoProperties;
 
+    public static void main(String[] args) {
+        System.out.println(MD5Util.md5("rootroot"));
+    }
+
     /**
      * 认证：登陆
      *
