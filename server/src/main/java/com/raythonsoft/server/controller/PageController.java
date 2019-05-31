@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.raythonsoft.common.util.StringUtils;
 import com.raythonsoft.sso.common.SsoConstant;
 import com.raythonsoft.sso.service.SessionService;
+import com.raythonsoft.sso.util.HttpUtil;
 import com.raythonsoft.sso.util.UrlUtil;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.RequestFacade;
@@ -36,43 +37,9 @@ public class PageController {
 
     AtomicInteger atomicInteger = new AtomicInteger();
 
-    static Field request;
-
-    static Field request1;
-
-    static Field coyoteRequest;
-
-    static {
-        try {
-            request = ServletRequestWrapper.class.getDeclaredField("request");
-            request.setAccessible(true);
-            request1 = RequestFacade.class.getDeclaredField("request");
-            request1.setAccessible(true);
-            coyoteRequest = Request.class.getDeclaredField("coyoteRequest");
-            coyoteRequest.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void setHeader(HttpServletRequest httpServletRequest, String k, String v) throws IllegalAccessException {
-        RequestFacade requestFacade = (RequestFacade) request.get(httpServletRequest);
-        Request request2 = (Request) request1.get(requestFacade);
-        org.apache.coyote.Request request3 = (org.apache.coyote.Request) coyoteRequest.get(request2);
-        MimeHeaders mimeHeaders = request3.getMimeHeaders();
-        MessageBytes val = mimeHeaders.addValue(k);
-        val.setString(v);
-    }
-
     @GetMapping("/")
     public String index(HttpServletRequest httpServletRequest, HttpServletResponse response, String backUrl) throws IllegalAccessException, NoSuchFieldException, IOException {
-        setHeader(httpServletRequest, "k", "v");
-
-        response.addHeader("萌狮" + atomicInteger.get(), "lalalal");
-        if (atomicInteger.getAndAdd(1) < 10) {
-            response.sendRedirect("redirect:/");
-            return null;
-        }
+        HttpUtil.setHeader(httpServletRequest, "k", "v");
 
         Subject subject = SecurityUtils.getSubject();
         Session session = subject.getSession();
